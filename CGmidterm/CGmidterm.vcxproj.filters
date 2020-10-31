@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="CG Code">
+      <UniqueIdentifier>{8A7B45D1-F65A-C46C-FF72-4F436BD12ACE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CG Code\Gameplay">
+      <UniqueIdentifier>{C91FE369-B518-02BC-DE4A-E740CAA2E1C7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CG Code\Graphics">
+      <UniqueIdentifier>{0ADF456B-F6D7-64BD-1F0A-4A420B6244C9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CG Code\Utilities">
+      <UniqueIdentifier>{7514E969-E12A-E7FF-2AA2-722196F7B787}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\CG Code\Gameplay\Camera.h">
+      <Filter>CG Code\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Gameplay\Transform.h">
+      <Filter>CG Code\Gameplay</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Graphics\IBuffer.h">
+      <Filter>CG Code\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Graphics\IndexBuffer.h">
+      <Filter>CG Code\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Graphics\Shader.h">
+      <Filter>CG Code\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Graphics\Texture2D.h">
+      <Filter>CG Code\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Graphics\Texture2DData.h">
+      <Filter>CG Code\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Graphics\TextureEnums.h">
+      <Filter>CG Code\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Graphics\VertexArrayObject.h">
+      <Filter>CG Code\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Graphics\VertexBuffer.h">
+      <Filter>CG Code\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Utilities\InputHelpers.h">
+      <Filter>CG Code\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Utilities\MeshBuilder.h">
+      <Filter>CG Code\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Utilities\MeshFactory.h">
+      <Filter>CG Code\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Utilities\NotObjLoader.h">
+      <Filter>CG Code\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Utilities\ObjLoader.h">
+      <Filter>CG Code\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Utilities\StringUtils.h">
+      <Filter>CG Code\Utilities</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CG Code\Utilities\VertexTypes.h">
+      <Filter>CG Code\Utilities</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\CG Code\Gameplay\Camera.cpp">
+      <Filter>CG Code\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Gameplay\Transform.cpp">
+      <Filter>CG Code\Gameplay</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Graphics\IBuffer.cpp">
+      <Filter>CG Code\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Graphics\Shader.cpp">
+      <Filter>CG Code\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Graphics\Texture2D.cpp">
+      <Filter>CG Code\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Graphics\Texture2DData.cpp">
+      <Filter>CG Code\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Graphics\VertexArrayObject.cpp">
+      <Filter>CG Code\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Utilities\InputHelpers.cpp">
+      <Filter>CG Code\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Utilities\MeshFactory.cpp">
+      <Filter>CG Code\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Utilities\NotObjLoader.cpp">
+      <Filter>CG Code\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Utilities\ObjLoader.cpp">
+      <Filter>CG Code\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CG Code\Utilities\VertexTypes.cpp">
+      <Filter>CG Code\Utilities</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp" />
+  </ItemGroup>
+</Project>
