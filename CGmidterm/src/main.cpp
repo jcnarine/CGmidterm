@@ -1,12 +1,12 @@
 #include <Logging.h>
 #include <iostream>
-
+#define GLM_ENABLE_EXPERIMENTAL
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-
 #include <filesystem>
 #include <json.hpp>
 #include <fstream>
+#include <glm/gtx/io.hpp>
 
 #include <GLM/glm.hpp>
 #include <GLM/gtc/matrix_transform.hpp>
@@ -31,6 +31,7 @@
 #include "CG Code/Utilities/VertexTypes.h"
 
 #define LOG_GL_NOTIFICATIONS
+
 
 /*
 	Handles debug messages from OpenGL
@@ -188,6 +189,8 @@ void RenderVAO(
 }
 
 void ManipulateTransformWithInput(const Transform::sptr& transform, float dt) {
+	std::cout <<(transform->GetLocalPosition()) << std::endl;
+
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
 		transform->MoveLocal( 1.0f * dt, 0.0f,  0.0f); 
 	}
@@ -255,39 +258,10 @@ int main() {
 	// Enable texturing
 	glEnable(GL_TEXTURE_2D);
 	
-	VertexArrayObject::sptr vao1 = ObjLoader::LoadFromFile("Objects/monkey_quads.obj");
-
-	static const VertexPosCol interleaved[] = {
-    //     X      Y     Z       R     G    B
-		{{ 0.5f, -0.5f, 0.0f},   {0.0f, 0.0f, 0.0f, 1.0f}},
-		{{ 0.5f,  0.5f, 0.0f},  {0.3f, 0.2f, 0.5f, 1.0f}},
-	    {{-0.5f,  0.5f, 0.0f},  {1.0f, 1.0f, 0.0f, 1.0f}},
-		{{ 0.5f,  1.0f, 0.0f},  {1.0f, 1.0f, 1.0f, 1.0f}}
-	};
-
-	VertexBuffer::sptr interleaved_vbo = VertexBuffer::Create();
-	interleaved_vbo->LoadData(interleaved, 4);
-
-	static const uint16_t indices[] = {
-		0, 1, 2,
-		1, 3, 2
-	};
-	IndexBuffer::sptr interleaved_ibo = IndexBuffer::Create();
-	interleaved_ibo->LoadData(indices, 3 * 2);
-
-	size_t stride = sizeof(VertexPosCol);
-	VertexArrayObject::sptr vao2 = VertexArrayObject::Create();
-	vao2->AddVertexBuffer(interleaved_vbo, VertexPosCol::V_DECL);
-	vao2->SetIndexBuffer(interleaved_ibo);
-		
-	// We'll use the provided mesh builder to build a new mesh with a few elements
-	MeshBuilder<VertexPosNormTexCol> builder = MeshBuilder<VertexPosNormTexCol>();
-	MeshFactory::AddCube(builder, glm::vec3(0.0f), glm::vec3(1.0f), glm::vec3(0.0f), glm::vec4(1.0f, 0.5f, 0.5f, 1.0f));
-	VertexArrayObject::sptr vao3 = builder.Bake();
-
-	// We'll be implementing a loader that works a bit like an OBJ loader to learn how to read files, we'll
-	// load an exact copy of the mesh created above
-	VertexArrayObject::sptr sceneVao = NotObjLoader::LoadFromFile("Objects/Sample.notobj");
+	VertexArrayObject::sptr table = ObjLoader::LoadFromFile("Objects/AirHockeyTable.obj");
+	VertexArrayObject::sptr puck = ObjLoader::LoadFromFile("Objects/AirHockeyPuck.obj");
+	VertexArrayObject::sptr player1 = ObjLoader::LoadFromFile("Objects/AirHockeyPad.obj");
+	VertexArrayObject::sptr player2 = ObjLoader::LoadFromFile("Objects/AirHockeyPad.obj");
 		
 	// Load our shaders
 	Shader::sptr shader = Shader::Create();
@@ -295,16 +269,87 @@ int main() {
 	shader->LoadShaderPartFromFile("Shaders/frag_blinn_phong_textured.glsl", GL_FRAGMENT_SHADER);  
 	shader->Link();  
 
-	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 2.0f);
-	glm::vec3 lightCol = glm::vec3(0.9f, 0.85f, 0.5f);
-	float     lightAmbientPow = 0.05f;
+	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 9.0f);
+	glm::vec3 lightCol = glm::vec3(0.3f, 0.42f, 0.69f);
+	float     lightAmbientPow = 10.0f;
 	float     lightSpecularPow = 1.0f;
 	glm::vec3 ambientCol = glm::vec3(1.0f);
 	float     ambientPow = 0.1f;
 	float     shininess = 4.0f;
-	float     lightLinearFalloff = 0.09f;
-	float     lightQuadraticFalloff = 0.032f;
+	float     lightLinearFalloff = 0.00f;
+	float     lightQuadraticFalloff = 0.020f;
 	
+	// TODO: load textures
+
+#pragma region Texture
+// Load our texture data from a file
+	Texture2DData::sptr diffuseMap = Texture2DData::LoadFromFile("Images/Carbon_Fiber_001_basecolor.jpg");
+	Texture2DData::sptr specularMap = Texture2DData::LoadFromFile("Images/Carbon_Fiber_001_basecolor.jpg");
+	// Create a texture from the data
+	Texture2D::sptr diffuse = Texture2D::Create();
+	diffuse->LoadData(diffuseMap);
+	Texture2D::sptr specular = Texture2D::Create();
+	specular->LoadData(specularMap);
+	// Creating an empty texture
+	Texture2DDescription desc = Texture2DDescription();
+	desc.Width = 1;
+	desc.Height = 1;
+	desc.Format = InternalFormat::RGB8;
+	Texture2D::sptr texture2 = Texture2D::Create(desc);
+	texture2->Clear();
+
+#pragma endregion RockTexture
+
+#pragma region Texture
+
+	Texture2DData::sptr diffuseMap2 = Texture2DData::LoadFromFile("Images/Carbon_Fiber_001_basecolor.jpg");
+	Texture2D::sptr diffuse2 = Texture2D::Create();
+	diffuse2->LoadData(diffuseMap2);
+	Texture2DDescription desc2 = Texture2DDescription();
+	desc2.Width = 1;
+	desc2.Height = 1;
+	desc2.Format = InternalFormat::RGB8;
+	Texture2D::sptr texture3 = Texture2D::Create(desc2);
+	texture3->Clear();
+
+#pragma endregion BoxTexture
+
+	// TODO: store some info about our materials for each object
+
+	// We'll use a temporary lil structure to store some info about our material (we'll expand this later)
+	Material materials[4];
+
+	materials[0].Albedo = diffuse;
+	materials[0].Specular = specular;
+	materials[0].DiffuseTexture = diffuse2;
+	materials[0].Shininess = 4.0f;
+	materials[0].TextureMix = 0.0;
+
+	materials[1].Albedo = diffuse;
+	materials[1].Specular = specular;
+	materials[1].DiffuseTexture = diffuse2;
+	materials[1].Shininess = 8.0f;
+	materials[1].TextureMix = 1.0f;
+
+	materials[2].Albedo = diffuse;
+	materials[2].Specular = specular;
+	materials[2].DiffuseTexture = diffuse2;
+	materials[2].Shininess = 32.0f;
+	materials[2].TextureMix = 0.7f;
+
+	materials[3].Albedo = diffuse;
+	materials[3].Specular = specular;
+	materials[3].DiffuseTexture = diffuse2;
+	materials[3].Shininess = 64.0f;
+	materials[3].TextureMix = 0.8f;
+
+
+	camera = Camera::Create();
+	camera->SetPosition(glm::vec3(0, 3, 20)); // Set initial position
+	camera->SetUp(glm::vec3(0, 0, 1)); // Use a z-up coordinate system
+	camera->LookAt(glm::vec3(0.0f)); // Look at center of the screen
+	camera->SetFovDegrees(100.0f); // Set an initial FOV
+	camera->SetOrthoHeight(20.0f);
 	// These are our application / scene level uniforms that don't necessarily update
 	// every frame
 	shader->SetUniform("u_LightPos", lightPos);
@@ -337,7 +382,7 @@ int main() {
 			if (ImGui::ColorPicker3("Light Col", glm::value_ptr(lightCol))) {
 				shader->SetUniform("u_LightCol", lightCol);
 			}
-			if (ImGui::SliderFloat("Light Ambient Power", &lightAmbientPow, 0.0f, 1.0f)) {
+			if (ImGui::SliderFloat("Light Ambient Power", &lightAmbientPow, 0.0f, 10.0f)) {
 				shader->SetUniform("u_AmbientLightStrength", lightAmbientPow);
 			}
 			if (ImGui::SliderFloat("Light Specular Power", &lightSpecularPow, 0.0f, 1.0f)) {
@@ -352,8 +397,11 @@ int main() {
 		}
 		if (ImGui::CollapsingHeader("Material Level Lighting Settings"))
 		{
-			if (ImGui::SliderFloat("Shininess", &shininess, 0.1f, 128.0f)) {
-				shader->SetUniform("u_Shininess", shininess);
+			if (ImGui::SliderFloat("Material One", &materials[0].Shininess, 0.1f, 128.0f)) {
+				shader->SetUniform("u_Shininess", materials[0].Shininess);
+			}
+			if (ImGui::SliderFloat("Material Two", &materials[1].Shininess, 0.1f, 128.0f)) {
+				shader->SetUniform("u_Shininess", materials[1].Shininess);
 			}
 		}
 	});
@@ -372,89 +420,17 @@ int main() {
 	transforms[3] = Transform::Create();
 
 	// We can use operator chaining, since our Set* methods return a pointer to the instance, neat!
-	transforms[1]->SetLocalPosition(2.0f, 0.0f, 0.5f)->SetLocalRotation(00.0f, 0.0f, 45.0f);
-	transforms[2]->SetLocalPosition(-2.0f, 0.0f, 0.5f)->SetLocalRotation(00.0f, 0.0f, -45.0f);
-	transforms[3]->SetLocalPosition(0.0f, 0.0f, 0.5f)->SetLocalRotation(00.0f, 0.0f, -45.0f);
+	transforms[0]->SetLocalPosition(0.0f, 0.0f, 0.0f)->SetLocalRotation(90.0, 0.0f, 0.0f);
+	transforms[1]->SetLocalPosition(0.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	transforms[2]->SetLocalPosition(0.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	transforms[3]->SetLocalPosition(0.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
 
 	// We'll store all our VAOs into a nice array for easy access
 	VertexArrayObject::sptr vaos[4];
-	vaos[0] = sceneVao;
-	vaos[1] = vao1;
-	vaos[2] = vao2;
-	vaos[3] = vao3;
-
-	// TODO: load textures
-
-
-	#pragma region Texture
-	// Load our texture data from a file
-	Texture2DData::sptr diffuseMap = Texture2DData::LoadFromFile("Images/Stone_001_Diffuse.png");
-	Texture2DData::sptr specularMap = Texture2DData::LoadFromFile("Images/Stone_001_Specular.png");
-	// Create a texture from the data
-	Texture2D::sptr diffuse = Texture2D::Create();
-	diffuse->LoadData(diffuseMap);
-	Texture2D::sptr specular = Texture2D::Create();
-	specular->LoadData(specularMap);
-	// Creating an empty texture
-	Texture2DDescription desc = Texture2DDescription();
-	desc.Width = 1;
-	desc.Height = 1;
-	desc.Format = InternalFormat::RGB8;
-	Texture2D::sptr texture2 = Texture2D::Create(desc);
-	texture2->Clear();
-
-	#pragma endregion RockTexture
-
-	#pragma region Texture
-
-	Texture2DData::sptr diffuseMap2 = Texture2DData::LoadFromFile("Images/sans.png");
-	Texture2D::sptr diffuse2 = Texture2D::Create();
-	diffuse2->LoadData(diffuseMap2);
-	Texture2DDescription desc2 = Texture2DDescription();
-	desc2.Width = 1;
-	desc2.Height = 1;
-	desc2.Format = InternalFormat::RGB8;
-	Texture2D::sptr texture3 = Texture2D::Create(desc2);
-	texture3->Clear();
-
-	#pragma endregion BoxTexture
-
-	// TODO: store some info about our materials for each object
-
-	// We'll use a temporary lil structure to store some info about our material (we'll expand this later)
-	Material materials[4];
-
-	materials[0].Albedo = diffuse;
-	materials[0].Specular = specular;
-	materials[0].DiffuseTexture = diffuse2;
-	materials[0].Shininess = 4.0f;
-	materials[0].TextureMix = 0.6;
-
-	materials[1].Albedo = diffuse;
-	materials[1].Specular = specular;
-	materials[1].DiffuseTexture = diffuse2;
-	materials[1].Shininess = 16.0f;
-	materials[1].TextureMix = 0.65f;
-
-	materials[2].Albedo = diffuse;
-	materials[2].Specular = specular;
-	materials[2].DiffuseTexture = diffuse2;
-	materials[2].Shininess = 32.0f;
-	materials[2].TextureMix = 0.7f;
-
-	materials[3].Albedo = diffuse;
-	materials[3].Specular = specular;
-	materials[3].DiffuseTexture = diffuse2;
-	materials[3].Shininess = 64.0f;
-	materials[3].TextureMix = 0.8f;
-
-
-	camera = Camera::Create();
-	camera->SetPosition(glm::vec3(0, 3, 3)); // Set initial position
-	camera->SetUp(glm::vec3(0, 0, 1)); // Use a z-up coordinate system
-	camera->LookAt(glm::vec3(0.0f)); // Look at center of the screen
-	camera->SetFovDegrees(90.0f); // Set an initial FOV
-	camera->SetOrthoHeight(3.0f);
+	vaos[0] = table;
+	vaos[1] = puck;
+	vaos[2] = player1;
+	vaos[3] = player2;
 
 	// We'll use a vector to store all our key press events for now
 	std::vector<KeyPressWatcher> keyToggles;
@@ -464,7 +440,7 @@ int main() {
 	// use std::bind
 	keyToggles.emplace_back(GLFW_KEY_T, [&](){ camera->ToggleOrtho(); });
 
-	int selectedVao = 2; // select cube by default
+	int selectedVao = 1; // select cube by default
 	keyToggles.emplace_back(GLFW_KEY_KP_ADD, [&]() {
 		selectedVao++;
 		if (selectedVao >= 4)
@@ -501,7 +477,7 @@ int main() {
 			// We'll run some basic input to move our transform around
 			ManipulateTransformWithInput(transforms[selectedVao], dt);
 		}
-						
+
 		glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
