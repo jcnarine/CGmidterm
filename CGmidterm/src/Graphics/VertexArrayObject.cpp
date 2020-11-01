@@ -1,7 +1,7 @@
-#include "CG Code/Graphics/VertexArrayObject.h"
-#include "CG Code/Graphics/IndexBuffer.h"
+#include "Graphics/VertexArrayObject.h"
+#include "Graphics/IndexBuffer.h"
 #include "Logging.h"
-#include "CG Code/Graphics/VertexBuffer.h"
+#include "Graphics/VertexBuffer.h"
 
 VertexArrayObject::VertexArrayObject() :
 	_indexBuffer(nullptr),

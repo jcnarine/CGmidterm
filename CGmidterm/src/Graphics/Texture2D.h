@@ -4,7 +4,7 @@
 #include <GLM/glm.hpp>
 
 #include "TextureEnums.h"
-#include "CG Code/Graphics/Texture2DData.h"
+#include "Graphics/Texture2DData.h"
 
 struct Texture2DDescription
 {

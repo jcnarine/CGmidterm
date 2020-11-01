@@ -1,9 +1,9 @@
 #pragma once
 #include <GLM/glm.hpp>
 #include <GLM/gtc/matrix_transform.hpp>
-#include "CG Code/Graphics/VertexArrayObject.h"
-#include "CG Code/Utilities/MeshBuilder.h"
-#include "CG Code/Utilities/VertexTypes.h"
+#include "Graphics/VertexArrayObject.h"
+#include "Utilities/MeshBuilder.h"
+#include "Utilities/VertexTypes.h"
 
 class MeshFactory
 {

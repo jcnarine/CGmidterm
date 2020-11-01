@@ -1,4 +1,4 @@
-#include "CG Code/Graphics/Texture2DData.h"
+#include "Graphics/Texture2DData.h"
 
 #include <filesystem>
 #include <stb_image.h>

@@ -1,4 +1,4 @@
-#include "CG Code/Utilities/VertexTypes.h"
+#include "Utilities/VertexTypes.h"
 #pragma warning( push )
 
 VertexPosCol* VPC = nullptr;

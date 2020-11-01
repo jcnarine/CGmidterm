@@ -12,23 +12,25 @@
 #include <GLM/gtc/matrix_transform.hpp>
 #include <GLM/gtc/type_ptr.hpp>
 
-#include "CG Code/Graphics/IndexBuffer.h"
-#include "CG Code/Graphics/VertexBuffer.h"
-#include "CG Code/Graphics/VertexArrayObject.h"
-#include "CG Code/Graphics/Shader.h"
-#include "CG Code/Gameplay/Camera.h"
+#include "Graphics/IndexBuffer.h"
+#include "Graphics/VertexBuffer.h"
+#include "Graphics/VertexArrayObject.h"
+#include "Graphics/Shader.h"
+#include "Gameplay/Camera.h"
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
-#include "CG Code/Gameplay/Transform.h"
-#include "CG Code/Graphics/Texture2D.h"
-#include "CG Code/Graphics/Texture2DData.h"
-#include "CG Code/Utilities/InputHelpers.h"
-#include "CG Code/Utilities/MeshBuilder.h"
-#include "CG Code/Utilities/MeshFactory.h"
-#include "CG Code/Utilities/NotObjLoader.h"
-#include "CG Code/Utilities/ObjLoader.h"
-#include "CG Code/Utilities/VertexTypes.h"
+#include "Gameplay/Transform.h"
+#include "Graphics/Texture2D.h"
+#include "Graphics/Texture2DData.h"
+#include "Utilities/InputHelpers.h"
+#include "Utilities/MeshBuilder.h"
+#include "Utilities/MeshFactory.h"
+#include "Utilities/NotObjLoader.h"
+#include "Utilities/ObjLoader.h"
+#include "Utilities/VertexTypes.h"
+#include "CollisionDetection.h"
+#include "GameObject.h"
 
 #define LOG_GL_NOTIFICATIONS
 
@@ -271,45 +273,64 @@ int main() {
 
 	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 9.0f);
 	glm::vec3 lightCol = glm::vec3(0.3f, 0.42f, 0.69f);
-	float     lightAmbientPow = 10.0f;
+	float     lightAmbientPow = 2.9f;
 	float     lightSpecularPow = 1.0f;
 	glm::vec3 ambientCol = glm::vec3(1.0f);
 	float     ambientPow = 0.1f;
-	float     shininess = 4.0f;
-	float     lightLinearFalloff = 0.00f;
-	float     lightQuadraticFalloff = 0.020f;
+	float     shininess = 0.0f;
+	float     lightLinearFalloff = 0.190f;
+	float     lightQuadraticFalloff = 0.010f;
 	
 	// TODO: load textures
 
 #pragma region Texture
 // Load our texture data from a file
-	Texture2DData::sptr diffuseMap = Texture2DData::LoadFromFile("Images/Carbon_Fiber_001_basecolor.jpg");
-	Texture2DData::sptr specularMap = Texture2DData::LoadFromFile("Images/Carbon_Fiber_001_basecolor.jpg");
+	Texture2DData::sptr diffuseMap = Texture2DData::LoadFromFile("Images/airHockey.png");
+	Texture2DData::sptr specularMap = Texture2DData::LoadFromFile("Images/Table_Specular.png");
 	// Create a texture from the data
-	Texture2D::sptr diffuse = Texture2D::Create();
-	diffuse->LoadData(diffuseMap);
-	Texture2D::sptr specular = Texture2D::Create();
-	specular->LoadData(specularMap);
+	Texture2D::sptr tableDiffuse = Texture2D::Create();
+	tableDiffuse->LoadData(diffuseMap);
+	Texture2D::sptr tableSpecular = Texture2D::Create();
+	tableSpecular->LoadData(specularMap);
 	// Creating an empty texture
-	Texture2DDescription desc = Texture2DDescription();
-	desc.Width = 1;
-	desc.Height = 1;
-	desc.Format = InternalFormat::RGB8;
-	Texture2D::sptr texture2 = Texture2D::Create(desc);
-	texture2->Clear();
+	Texture2DDescription tableDesc = Texture2DDescription();
+	tableDesc.Width = 1;
+	tableDesc.Height = 1;
+	tableDesc.Format = InternalFormat::RGB8;
+	Texture2D::sptr tableTexture = Texture2D::Create(tableDesc);
+	tableTexture->Clear();
 
-#pragma endregion RockTexture
+#pragma endregion PlasticTexture
+
+#pragma region Texture
+// Load our texture data from a file
+	Texture2DData::sptr plasticDiffuseMap = Texture2DData::LoadFromFile("Images/Plastic_Diffuse.png");
+	Texture2DData::sptr specularDiffuseMap = Texture2DData::LoadFromFile("Images/Plastic_Specular.png");
+	// Create a texture from the data
+	Texture2D::sptr plasticDiffuse = Texture2D::Create();
+	plasticDiffuse->LoadData(plasticDiffuseMap);
+	Texture2D::sptr plasticSpecular = Texture2D::Create();
+	plasticSpecular->LoadData(specularDiffuseMap);
+	// Creating an empty texture
+	Texture2DDescription plasticDesc = Texture2DDescription();
+	plasticDesc.Width = 1;
+	plasticDesc.Height = 1;
+	plasticDesc.Format = InternalFormat::RGB8;
+	Texture2D::sptr plasticTexture = Texture2D::Create(plasticDesc);
+	plasticTexture->Clear();
+
+#pragma endregion PlasticTexture
 
 #pragma region Texture
 
-	Texture2DData::sptr diffuseMap2 = Texture2DData::LoadFromFile("Images/Carbon_Fiber_001_basecolor.jpg");
-	Texture2D::sptr diffuse2 = Texture2D::Create();
-	diffuse2->LoadData(diffuseMap2);
-	Texture2DDescription desc2 = Texture2DDescription();
-	desc2.Width = 1;
-	desc2.Height = 1;
-	desc2.Format = InternalFormat::RGB8;
-	Texture2D::sptr texture3 = Texture2D::Create(desc2);
+	Texture2DData::sptr boxDiffuseMap = Texture2DData::LoadFromFile("Images/box.bmp");
+	Texture2D::sptr boxDiffuse = Texture2D::Create();
+	boxDiffuse->LoadData(boxDiffuseMap);
+	Texture2DDescription boxDesc = Texture2DDescription();
+	boxDesc.Width = 1;
+	boxDesc.Height = 1;
+	boxDesc.Format = InternalFormat::RGB8;
+	Texture2D::sptr texture3 = Texture2D::Create(boxDesc);
 	texture3->Clear();
 
 #pragma endregion BoxTexture
@@ -319,27 +340,27 @@ int main() {
 	// We'll use a temporary lil structure to store some info about our material (we'll expand this later)
 	Material materials[4];
 
-	materials[0].Albedo = diffuse;
-	materials[0].Specular = specular;
-	materials[0].DiffuseTexture = diffuse2;
+	materials[0].Albedo = tableDiffuse;
+	materials[0].Specular = tableSpecular;
+	materials[0].DiffuseTexture = boxDiffuse;
 	materials[0].Shininess = 4.0f;
 	materials[0].TextureMix = 0.0;
 
-	materials[1].Albedo = diffuse;
-	materials[1].Specular = specular;
-	materials[1].DiffuseTexture = diffuse2;
-	materials[1].Shininess = 8.0f;
-	materials[1].TextureMix = 1.0f;
+	materials[1].Albedo = plasticDiffuse;
+	materials[1].Specular = plasticSpecular;
+	materials[1].DiffuseTexture = boxDiffuse;
+	materials[1].Shininess = 32.0f;
+	materials[1].TextureMix = 0.0f;
 
-	materials[2].Albedo = diffuse;
-	materials[2].Specular = specular;
-	materials[2].DiffuseTexture = diffuse2;
+	materials[2].Albedo = plasticDiffuse;
+	materials[2].Specular = plasticSpecular;
+	materials[2].DiffuseTexture = boxDiffuse;
 	materials[2].Shininess = 32.0f;
 	materials[2].TextureMix = 0.7f;
 
-	materials[3].Albedo = diffuse;
-	materials[3].Specular = specular;
-	materials[3].DiffuseTexture = diffuse2;
+	materials[3].Albedo = plasticDiffuse;
+	materials[3].Specular = plasticSpecular;
+	materials[3].DiffuseTexture = boxDiffuse;
 	materials[3].Shininess = 64.0f;
 	materials[3].TextureMix = 0.8f;
 
@@ -440,7 +461,7 @@ int main() {
 	// use std::bind
 	keyToggles.emplace_back(GLFW_KEY_T, [&](){ camera->ToggleOrtho(); });
 
-	int selectedVao = 1; // select cube by default
+	int selectedVao = 0; // select cube by default
 	keyToggles.emplace_back(GLFW_KEY_KP_ADD, [&]() {
 		selectedVao++;
 		if (selectedVao >= 4)

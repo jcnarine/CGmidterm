@@ -1,4 +1,4 @@
-#include "CG Code/Gameplay/Transform.h"
+#include "Gameplay/Transform.h"
 
 #include <GLM/gtc/matrix_transform.hpp>
 #define GLM_ENABLE_EXPERIMENTAL

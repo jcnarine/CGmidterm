@@ -1,15 +1,36 @@
 #include "GameObject.h"
 
-GameObject::GameObject()
+GameObject::GameObject(glm::vec3 s, const Transform::sptr& t, std::string name)
 {
-	//Default Constructor
+	position = t->GetLocalPosition();
+	transform = &t;
+	tag = name;
+
+	if (name == "paddle")
+	{
+		size = s;
+		radius = 10;
+	}
+	else if (name == "puck")
+	{
+		size = s;
+		radius = 5;
+	}
 }
 
-GameObject::GameObject(glm::vec2 pos, glm::vec2 size, glm::vec2 vel)
+GameObject::GameObject(glm::vec3 s, glm::vec3 p, std::string t){
+
+	position = p;
+	tag = t;
+
+	 if (tag == "wall")
+	 {
+		size = s;
+	 }
+}
+
+void GameObject::UpdatePosition()
 {
-	//Instance of struct created. 'puck variable will get the data of the pucks position, size and velocity
-	ObjectProperties puck{ pos, size, vel };
-
-
-	
+    Transform::sptr temp = *transform;
+	position = temp->GetLocalPosition();
 }

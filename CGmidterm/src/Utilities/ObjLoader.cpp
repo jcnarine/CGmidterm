@@ -1,4 +1,4 @@
-#include "CG Code/Utilities/ObjLoader.h"
+#include "Utilities/ObjLoader.h"
 
 #include <string>
 #include <sstream>
@@ -6,7 +6,7 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "CG Code/Utilities/StringUtils.h"
+#include "Utilities/StringUtils.h"
 
 VertexArrayObject::sptr ObjLoader::LoadFromFile(const std::string& filename, const glm::vec4& inColor)
 {	

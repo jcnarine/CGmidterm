@@ -1,10 +1,10 @@
-#include "CG Code/Utilities/NotObjLoader.h"
+#include "Utilities/NotObjLoader.h"
 #include <string>
 #include <sstream>
 #include <fstream>
 #include <iostream>
 
-#include "CG Code/Utilities/StringUtils.h"
+#include "Utilities/StringUtils.h"
 
 VertexArrayObject::sptr NotObjLoader::LoadFromFile(const std::string& filename)
 {
