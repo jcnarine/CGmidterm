@@ -194,22 +194,22 @@ void ManipulateTransformWithInput(const Transform::sptr& transform, float dt) {
 	std::cout <<(transform->GetLocalPosition()) << std::endl;
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		transform->MoveLocal( 1.0f * dt, 0.0f,  0.0f); 
+		transform->MoveLocal( 5.0f * dt, 0.0f,  0.0f); 
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { 
-		transform->MoveLocal(-1.0f * dt, 0.0f, 0.0f);
+		transform->MoveLocal(-5.0f * dt, 0.0f, 0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f, -1.0f * dt, 0.0f);
+		transform->MoveLocal(0.0f, -5.0f * dt, 0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f,  1.0f * dt, 0.0f);
+		transform->MoveLocal(0.0f,  5.0f * dt, 0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f, 0.0f,  1.0f * dt);
+		transform->MoveLocal(0.0f, 0.0f,  5.0f * dt);
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f, 0.0f, -1.0f * dt);
+		transform->MoveLocal(0.0f, 0.0f, -5.0f * dt);
 	}
 
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { 
