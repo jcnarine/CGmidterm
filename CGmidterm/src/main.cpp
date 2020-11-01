@@ -356,13 +356,13 @@ int main() {
 	materials[2].Specular = plasticSpecular;
 	materials[2].DiffuseTexture = boxDiffuse;
 	materials[2].Shininess = 32.0f;
-	materials[2].TextureMix = 0.7f;
+	materials[2].TextureMix = 0.0f;
 
 	materials[3].Albedo = plasticDiffuse;
 	materials[3].Specular = plasticSpecular;
 	materials[3].DiffuseTexture = boxDiffuse;
-	materials[3].Shininess = 64.0f;
-	materials[3].TextureMix = 0.8f;
+	materials[3].Shininess = 32.0f;
+	materials[3].TextureMix = 0.0f;
 
 
 	camera = Camera::Create();
@@ -443,8 +443,8 @@ int main() {
 	// We can use operator chaining, since our Set* methods return a pointer to the instance, neat!
 	transforms[0]->SetLocalPosition(0.0f, 0.0f, 0.0f)->SetLocalRotation(90.0, 0.0f, 0.0f);
 	transforms[1]->SetLocalPosition(0.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
-	transforms[2]->SetLocalPosition(0.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
-	transforms[3]->SetLocalPosition(0.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	transforms[2]->SetLocalPosition(3.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	transforms[3]->SetLocalPosition(-3.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
 
 	// We'll store all our VAOs into a nice array for easy access
 	VertexArrayObject::sptr vaos[4];
