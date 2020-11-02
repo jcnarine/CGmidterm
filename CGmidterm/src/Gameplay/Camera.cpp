@@ -1,4 +1,4 @@
-#include "CG Code/Gameplay/Camera.h"
+#include "Gameplay/Camera.h"
 
 #include <GLM/gtc/matrix_transform.hpp>
 

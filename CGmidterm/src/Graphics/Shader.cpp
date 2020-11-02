@@ -1,4 +1,4 @@
-#include "CG Code/Graphics/Shader.h"
+#include "Graphics/Shader.h"
 #include "Logging.h"
 #include <fstream>
 #include <sstream>

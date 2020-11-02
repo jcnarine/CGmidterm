@@ -1,4 +1,4 @@
-#include "CG Code/Graphics/Texture2D.h"
+#include "Graphics/Texture2D.h"
 
 int Texture2D::MAX_TEXTURE_SIZE = 0;
 

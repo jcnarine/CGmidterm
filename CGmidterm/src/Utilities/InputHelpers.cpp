@@ -1,4 +1,4 @@
-#include "CG Code/Utilities/InputHelpers.h"
+#include "Utilities/InputHelpers.h"
 #include <GLFW/glfw3.h>
 
 KeyPressWatcher::KeyPressWatcher(int keycode, const std::function<void()>& onPressed) {

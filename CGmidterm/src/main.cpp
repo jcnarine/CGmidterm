@@ -445,11 +445,7 @@ int main() {
 	materials[2].Shininess = 32.0f;
 	materials[2].TextureMix = 0.0f;
 
-	materials[3].Albedo = plasticDiffuse;
-	materials[3].Specular = plasticSpecular;
-	materials[3].DiffuseTexture = boxDiffuse;
 	materials[3].Shininess = 32.0f;
-	materials[3].TextureMix = 0.0f;
 
 
 	camera = Camera::Create();
