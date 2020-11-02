@@ -257,40 +257,64 @@ void Player1Input(const Transform::sptr& transform, float dt)
 	//float variable that initilaizes the mass of the puck
 	float mass = 5.0f;
 
+	//
 	glm::vec3 newVelocity = glm::vec3(0.0f, 0.0f, 0.0f);
 
+	//friction variable 
+	const float friciton = 0.45f;
 
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+	//Bool variable that checks 
+	bool isKeyPressed = false;
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_A) != GLFW_RELEASE) {
 		force += glm::vec3(15.0f, 0.0f, 0.0f);
+		isKeyPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_D) != GLFW_RELEASE) {
 		force += glm::vec3(-15.0f, 0.0f, 0.0f);
-		//transform->MoveLocal(-5.0f * dt, 0.0f, 0.0f);
+		isKeyPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_W) != GLFW_RELEASE) {
 		force += glm::vec3(0.0f, -15.0f, 0.0f);
-		//transform->MoveLocal(0.0f, 0.0f, 5.0f * dt);
+		isKeyPressed = true;
 	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_S) != GLFW_RELEASE) {
 		force += glm::vec3(0.0f, 15.0f, 0.0f);
-		//transform->MoveLocal(0.0f, 0.0f, -5.0f * dt);
+		isKeyPressed = true;
 	}
+	else
+	{
+		isKeyPressed = false;
+	}
+
+
 
 	//Calculation is done for acceleration
-	glm::fvec3 acceleration = force / mass;
+	glm::fvec3 initialAcceleration = force / mass;
 	
 	//Calculate maginitude
 	glm::vec3 Magnitude = (sqrt(transform->GetLocalPosition()));
 
 	//Calculate velocity
-	newVelocity = initialVelocity + (acceleration * dt);
-
-	glm::vec3 position = transform->GetLocalPosition() + (glm::vec3(newVelocity.x, newVelocity.y, newVelocity.z) * dt) + (glm::vec3(acceleration.x, acceleration.y, acceleration.z) * (0.5f) * (dt * dt));
+	newVelocity = initialVelocity + (initialAcceleration * dt);
 	
+	//Friction Check Logic
+	if (isKeyPressed == false && (initialAcceleration.x > 1.0f))
+	{
+		initialAcceleration *= friciton;
+	}
+
+
+	//Calculates the position
+	glm::vec3 position = transform->GetLocalPosition() + (glm::vec3(newVelocity.x, newVelocity.y, newVelocity.z) * dt) + (glm::vec3(initialAcceleration.x, initialAcceleration.y, initialAcceleration.z) * (0.5f) * (dt * dt));
+	
+	
+	//set the local position of the second paddle
 	transform->SetLocalPosition(position.x, position.y, position.z);
 
-	
-	
+
 		
 }
 
@@ -562,6 +586,7 @@ int main() {
 			Player1Input(transforms[3], dt);
 			//ManipulateTransformWithInput(transforms[2], dt);
 		}
+
 
 		glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
