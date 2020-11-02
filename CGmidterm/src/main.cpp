@@ -23,6 +23,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "Gameplay/Transform.h"
+#include "Gameplay/ScoreUI.h"
 #include "Graphics/Texture2D.h"
 #include "Graphics/Texture2DData.h"
 #include "Utilities/InputHelpers.h"
@@ -354,6 +355,8 @@ struct Material
 	float           Shininess;
 };
 
+
+
 int main() {
 	Logger::Init(); // We'll borrow the logger from the toolkit, but we need to initialize it
 
@@ -377,6 +380,19 @@ int main() {
 	VertexArrayObject::sptr puck = ObjLoader::LoadFromFile("Objects/AirHockeyPuck.obj");
 	VertexArrayObject::sptr player1 = ObjLoader::LoadFromFile("Objects/AirHockeyPad.obj");
 	VertexArrayObject::sptr player2 = ObjLoader::LoadFromFile("Objects/AirHockeyPad.obj");
+	VertexArrayObject::sptr P1Score = ObjLoader::LoadFromFile("Objects/ScoreCounter-0-FINAL.obj");
+	VertexArrayObject::sptr P2Score = ObjLoader::LoadFromFile("Objects/ScoreCounter-0-FINAL.obj");
+	
+	//ScoreUI objects sets the current OBJ
+	score_1.setCurrentVAO(P1Score);
+	score_2.setCurrentVAO(P2Score);
+
+
+	//ADD THE REST OF THE OBJ'S
+	//ADD NEW MATERIAL FOR SECOND SCORE
+	//LOOK INTO REASSIGNING OBJ FILE 
+	//if statment with score as a varilable and load in different objects
+	//Score += 1 within function adn update score accordingly
 		
 	// Load our shaders
 	Shader::sptr shader = Shader::Create();
@@ -467,10 +483,45 @@ int main() {
 
 #pragma endregion BoxTexture
 
+#pragma region Texture
+	Texture2DData::sptr P2scoreDiffuseMap = Texture2DData::LoadFromFile("Images/Red Color.jpg");
+	Texture2DData::sptr scoreSpecularMap = Texture2DData::LoadFromFile("Images/Red Color.jpg");
+	// Create a texture from the data
+	Texture2D::sptr P2scoreDiffuse = Texture2D::Create();
+	P2scoreDiffuse->LoadData(P2scoreDiffuseMap);
+	Texture2D::sptr P2scoreSpecular = Texture2D::Create();
+	P2scoreSpecular->LoadData(scoreSpecularMap);
+	// Creating an empty texture
+	Texture2DDescription P2scoreDesc = Texture2DDescription();
+	P2scoreDesc.Width = 1;
+	P2scoreDesc.Height = 1;
+	P2scoreDesc.Format = InternalFormat::RGB8;
+	Texture2D::sptr P2scoreTexture = Texture2D::Create(P2scoreDesc);
+	P2scoreTexture->Clear();
+
+#pragma endregion Score Texture
+
+#pragma region Texture
+	Texture2DData::sptr P1scoreDiffuseMap = Texture2DData::LoadFromFile("Images/Light Blue.jpg");
+	Texture2DData::sptr P1scoreSpecularMap = Texture2DData::LoadFromFile("Images/Light Blue.jpg");
+	// Create a texture from the data
+	Texture2D::sptr P1scoreDiffuse = Texture2D::Create();
+	P1scoreDiffuse->LoadData(P1scoreDiffuseMap);
+	Texture2D::sptr P1scoreSpecular = Texture2D::Create();
+	P1scoreSpecular->LoadData(P1scoreSpecularMap);
+	// Creating an empty texture
+	Texture2DDescription P1scoreDesc = Texture2DDescription();
+	P1scoreDesc.Width = 1;
+	P1scoreDesc.Height = 1;
+	P1scoreDesc.Format = InternalFormat::RGB8;
+	Texture2D::sptr P1scoreTexture = Texture2D::Create(P1scoreDesc);
+	P1scoreTexture->Clear();
+
+#pragma endregion Score Texture
 	// TODO: store some info about our materials for each object
 
 	// We'll use a temporary lil structure to store some info about our material (we'll expand this later)
-	Material materials[4];
+	Material materials[6];
 
 	materials[0].Albedo = tableDiffuse;
 	materials[0].Specular = tableSpecular;
@@ -571,30 +622,34 @@ int main() {
 	// NEW STUFF
 
 	// Create some transforms and initialize them
-	Transform::sptr transforms[4];
+	Transform::sptr transforms[6];
 	transforms[0] = Transform::Create();
 	transforms[1] = Transform::Create();
 	transforms[2] = Transform::Create();
 	transforms[3] = Transform::Create();
+	transforms[4] = Transform::Create();
+	transforms[5] = Transform::Create();
+
+
 
 	// We can use operator chaining, since our Set* methods return a pointer to the instance, neat!
 	transforms[0]->SetLocalPosition(0.0f, 0.0f, 0.0f)->SetLocalRotation(90.0, 0.0f, 0.0f);
 	transforms[1]->SetLocalPosition(0.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
 	transforms[2]->SetLocalPosition(3.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
 	transforms[3]->SetLocalPosition(-3.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	transforms[4]->SetLocalPosition(-7.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
+	transforms[5]->SetLocalPosition(14.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
 
 	// We'll store all our VAOs into a nice array for easy access
-	VertexArrayObject::sptr vaos[4];
+	VertexArrayObject::sptr vaos[6];
 	vaos[0] = table;
 	vaos[1] = puck;
 	vaos[2] = player1;
 	vaos[3] = player2;
-
-	P1.setTransform(transforms[2]);
-	P2.setTransform(transforms[3]);
-
-	P1.setTag(playerTag::PLAYER_ONE);
-	P2.setTag(playerTag::PLAYER_TWO);
+	vaos[4] = P1Score;
+	vaos[5] = P2Score;
+	
+	
 
 	// We'll use a vector to store all our key press events for now
 	std::vector<KeyPressWatcher> keyToggles;
@@ -604,7 +659,7 @@ int main() {
 	// use std::bind
 	keyToggles.emplace_back(GLFW_KEY_T, [&](){ camera->ToggleOrtho(); });
 
-	int selectedVao = 2; // select cube by default
+	int selectedVao = 0; // select cube by default
 	keyToggles.emplace_back(GLFW_KEY_KP_ADD, [&]() {
 		selectedVao++;
 		if (selectedVao >= 4)
@@ -615,6 +670,8 @@ int main() {
 		if (selectedVao <= 0)
 			selectedVao = 3;
 	});
+
+
 
 	InitImGui();
 		
@@ -690,7 +747,7 @@ int main() {
 		shader->SetUniform("s_Diffuse2", 2);
 		
 		// Render all VAOs in our scene
-		for(int ix = 0; ix < 4; ix++) {
+		for(int ix = 0; ix < 6; ix++) {
 			// TODO: Apply materials
 			// Apply material properties for each instance
 			materials[ix].Albedo->Bind(0);
