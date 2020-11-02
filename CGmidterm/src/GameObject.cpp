@@ -1,36 +1,26 @@
 #include "GameObject.h"
 
-GameObject::GameObject(glm::vec3 s, const Transform::sptr& t, std::string name)
+GameObject::GameObject()
 {
-	position = t->GetLocalPosition();
-	transform = &t;
-	tag = name;
 
-	if (name == "paddle")
-	{
-		size = s;
-		radius = 10;
-	}
-	else if (name == "puck")
-	{
-		size = s;
-		radius = 5;
-	}
 }
 
-GameObject::GameObject(glm::vec3 s, glm::vec3 p, std::string t){
-
+GameObject::GameObject(glm::vec3 p, objectTag t)
+{
 	position = p;
-	tag = t;
+	item = t;
 
-	 if (tag == "wall")
-	 {
-		size = s;
-	 }
-}
+	if (item == objectTag::BM_WALL || item ==objectTag::T_WALL)
+	{
+		size = glm::vec2(31.4, 21.7);
+	}
+	else if (item == objectTag::LS_WALL || item == objectTag::RS_WALL)
+	{
+		size = glm::vec2(2, 11.3);
 
-void GameObject::UpdatePosition()
-{
-    Transform::sptr temp = *transform;
-	position = temp->GetLocalPosition();
+	}else{
+		
+		size = glm::vec2(2.05, 2.05);
+		radius = 1.025f;
+	}
 }

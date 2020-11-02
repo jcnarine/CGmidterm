@@ -11,11 +11,8 @@ class CollisionDetection
 {
 
 public:
-
-	static void CheckCollision(GameObject& one, GameObject& two);
-	static bool CheckSphereCollision(GameObject& one, GameObject& two);
-	//Sphere - Sphere collision
-	static bool CheckWallCollision(GameObject& one, GameObject& two); // Sphere - AABB collision
+	static bool CheckSphereCollision(GameObject& one, GameObject& two); //Sphere - Sphere collision
+	static objectTag CheckWallCollision(GameObject& puck);
 };
 
 
