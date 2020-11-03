@@ -333,7 +333,7 @@ void puckCollisionWithPlayer(objectTag t){
 	if (t== objectTag::P1){
 
 		vec3 collision = P1.getPosition() - puckObject.getPosition();
-		double distance = collision.length();
+		double distance = (double)collision.length();
 
 		if (distance == 0.0) {              // hack to avoid div by zero
 
@@ -341,7 +341,7 @@ void puckCollisionWithPlayer(objectTag t){
 
 			double distance = 1.0;
 		}
-		if (distance > 1.0)
+		if (distance > 3.0)
 			return;
 
 
@@ -365,7 +365,7 @@ void puckCollisionWithPlayer(objectTag t){
 	}else if(t== objectTag::P2){
 
 		vec3 collision = P2.getPosition() - puckObject.getPosition();
-		double distance = collision.length();
+		double distance = (double)collision.length();
 
 		if (distance == 0.0) {              // hack to avoid div by zero
 
@@ -373,7 +373,7 @@ void puckCollisionWithPlayer(objectTag t){
 
 			double distance = 1.0;
 		}
-		if (distance > 1.0)
+		if (distance > 3.0)
 			return;
 
 
@@ -810,6 +810,9 @@ int main() {
 		circles[0].UpdatePosition(transforms[1]->GetLocalPosition());
 		circles[1].UpdatePosition(transforms[2]->GetLocalPosition());
 		circles[2].UpdatePosition(transforms[3]->GetLocalPosition());
+
+		//Calls the Move Puck Function which calculates physics for the puck
+		puckObject.movePuck();
 
 		objectTag boxCol = CollisionDetection::CheckWallCollision(circles[0]);
 		if (!(boxCol== objectTag::NONE)){

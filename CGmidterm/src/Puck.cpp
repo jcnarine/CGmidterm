@@ -27,11 +27,11 @@ void Puck::movePuck()
 	newVelocity = initialVelocity + (initialAcceleration * deltaTime);
 
 	//Friction Check Logic
-	if (isKeyPressed == false)
-	{
-		initialAcceleration *= friction;
+	force.x *= friction;
+	force.y *= friction;
 
-	}
+	newVelocity.x *= friction;
+	newVelocity.y *= friction;
 
 	//Calculates the position
 	glm::vec3 position = transform->GetLocalPosition() + (glm::vec3(newVelocity.x, newVelocity.y, newVelocity.z) * deltaTime) + (glm::vec3(initialAcceleration.x, initialAcceleration.y, initialAcceleration.z) * (0.5f) * (deltaTime * deltaTime));
