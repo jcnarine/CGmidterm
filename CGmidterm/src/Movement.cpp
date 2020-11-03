@@ -1,12 +1,12 @@
-#include "Player.h"
+#include "Movement.h"
 
 //https://gamedev.stackexchange.com/questions/4673/how-do-i-implement-deceleration
 
-Player::~Player()
+Movement::~Movement()
 {
 }
 
-void Player::movePlayer(){
+void Movement::movePlayer(){
 	//Calculation is done for acceleration
 	glm::fvec3 initialAcceleration = force / mass;
 
