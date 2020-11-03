@@ -20,11 +20,19 @@ void Movement::movePlayer() {
 	//Calculate velocity
 	newVelocity = initialVelocity + (initialAcceleration * deltaTime);
 
-	//Friction Check Logic
+	//Deceleration Check Logic
 	if (isKeyPressed == false)
 	{
-		initialAcceleration *= friction;
+		//If the user let's go of the keys, a forc of friction is applied 
+		//On the paddles and is multiplied by the current force.
+		//By doing this, the force slowly decreases to zero, and thus causes the paddles to decelerate
+		force.x *= friction;
+		force.y *= friction;
 
+		//neVelocity is also multiplied by the friction. By doing this, velocity changes and causes the velocity
+		//to be reset to zero (i.e the padlles have no change in position and therefore are not moving)
+		newVelocity.x *= friction;
+		newVelocity.y *= friction;
 	}
 
 	//Calculates the position
@@ -44,5 +52,6 @@ void Movement::movePlayer() {
 
 	//set the local position of the second 
 	transform->SetLocalPosition(position.x, position.y, position.z);
+
 }
 

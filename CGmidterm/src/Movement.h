@@ -45,8 +45,10 @@ protected:
 	float deltaTime = 0;
 
 	vec3 newVelocity = vec3(0.0f, 0.0f, 0.0f);
+	
 	//friction variable 
-	const float friction = 0.45f;
+	const float friction = 0.98f;
+
 
 	//Bool variable that checks 
 	bool isKeyPressed = false;
