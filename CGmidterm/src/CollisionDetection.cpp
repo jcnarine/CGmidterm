@@ -1,4 +1,5 @@
 #include "CollisionDetection.h"
+#include "Gameplay/ScoreUI.h"
 
 //Referenced from https://stackoverflow.com/questions/27342362/how-to-create-a-circle-collision-detection-c/27342421
 
@@ -32,6 +33,10 @@
       if (tempPosition.x < -12.63f && !(tempPosition.y > -1.308 && tempPosition.y < 0.774)) {
       return objectTag::RS_WALL;
       }
+      if (tempPosition.y >= 4.442f) {
+        //setTotalScore();
+      }
+
 
       return objectTag::NONE;
   }

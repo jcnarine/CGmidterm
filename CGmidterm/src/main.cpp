@@ -484,20 +484,20 @@ int main() {
 
 #pragma region Texture
 // Load our texture data from a file
-	Texture2DData::sptr paddlediffuseMap = Texture2DData::LoadFromFile("Images/Paddle_Diffuse.png");
-	Texture2DData::sptr paddlespecularMap = Texture2DData::LoadFromFile("Images/Paddle_Specular.png");
-	// Create a texture from the data
-	Texture2D::sptr paddleDiffuse = Texture2D::Create();
-	paddleDiffuse->LoadData(paddlediffuseMap);
-	Texture2D::sptr paddleSpecular = Texture2D::Create();
-	paddleSpecular->LoadData(paddlespecularMap);
-	// Creating an empty texture
-	Texture2DDescription PaddleDesc = Texture2DDescription();
-	PaddleDesc.Width = 1;
-	PaddleDesc.Height = 1;
-	PaddleDesc.Format = InternalFormat::RGB8;
-	Texture2D::sptr paddleTexture = Texture2D::Create(PaddleDesc);
-	paddleTexture->Clear();
+	//Texture2DData::sptr paddlediffuseMap = Texture2DData::LoadFromFile("Images/Paddle_Diffuse.png");
+	//Texture2DData::sptr paddlespecularMap = Texture2DData::LoadFromFile("Images/Paddle_Specular.png");
+	//// Create a texture from the data
+	//Texture2D::sptr paddleDiffuse = Texture2D::Create();
+	//paddleDiffuse->LoadData(paddlediffuseMap);
+	//Texture2D::sptr paddleSpecular = Texture2D::Create();
+	//paddleSpecular->LoadData(paddlespecularMap);
+	//// Creating an empty texture
+	//Texture2DDescription PaddleDesc = Texture2DDescription();
+	//PaddleDesc.Width = 1;
+	//PaddleDesc.Height = 1;
+	//PaddleDesc.Format = InternalFormat::RGB8;
+	//Texture2D::sptr paddleTexture = Texture2D::Create(PaddleDesc);
+	//paddleTexture->Clear();
 
 #pragma endregion TableTexture
 
@@ -605,22 +605,30 @@ int main() {
 	materials[1].Shininess = 32.0f;
 	materials[1].TextureMix = 0.0f;
 
-	materials[2].Albedo = paddleDiffuse;
-	materials[2].Specular = paddleSpecular;
+	materials[2].Albedo = plasticDiffuse;
+	materials[2].Specular = plasticSpecular;
 	materials[2].DiffuseTexture = boxDiffuse;
 	materials[2].Shininess = 32.0f;
 	materials[2].TextureMix = 0.0f;
 
-<<<<<<< Updated upstream
+
 	materials[3].Albedo = plasticDiffuse;
 	materials[3].Specular = plasticSpecular;
-=======
-	materials[3].Albedo = paddleDiffuse;
-	materials[3].Specular = paddleSpecular;
->>>>>>> Stashed changes
 	materials[3].DiffuseTexture = boxDiffuse;
 	materials[3].Shininess = 32.0f;
 	materials[3].TextureMix = 0.0f;
+
+	materials[4].Albedo = P2scoreDiffuse;
+	materials[4].Specular = P2scoreSpecular;
+	materials[4].DiffuseTexture = boxDiffuse;
+	materials[4].Shininess = 32.0f;
+	materials[4].TextureMix = 0.0f;
+
+	materials[5].Albedo = P1scoreDiffuse;
+	materials[5].Specular = P1scoreSpecular;
+	materials[5].DiffuseTexture = boxDiffuse;
+	materials[5].Shininess = 32.0f;
+	materials[5].TextureMix = 0.0f;
 
 
 	camera = Camera::Create();
@@ -692,30 +700,34 @@ int main() {
 	// NEW STUFF
 
 	// Create some transforms and initialize them
-	Transform::sptr transforms[4];
+	Transform::sptr transforms[6];
 	transforms[0] = Transform::Create();
 	transforms[1] = Transform::Create();
 	transforms[2] = Transform::Create();
 	transforms[3] = Transform::Create();
+	transforms[4] = Transform::Create();
+	transforms[5] = Transform::Create();
+
+
 
 	// We can use operator chaining, since our Set* methods return a pointer to the instance, neat!
 	transforms[0]->SetLocalPosition(0.0f, 0.0f, 0.0f)->SetLocalRotation(90.0, 0.0f, 0.0f);
 	transforms[1]->SetLocalPosition(0.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
 	transforms[2]->SetLocalPosition(3.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
 	transforms[3]->SetLocalPosition(-3.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	transforms[4]->SetLocalPosition(-7.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
+	transforms[5]->SetLocalPosition(14.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
 
 	// We'll store all our VAOs into a nice array for easy access
-	VertexArrayObject::sptr vaos[4];
+	VertexArrayObject::sptr vaos[6];
 	vaos[0] = table;
 	vaos[1] = puck;
 	vaos[2] = player1;
 	vaos[3] = player2;
-
-	P1.setTransform(transforms[2]);
-	P2.setTransform(transforms[3]);
-
-	P1.setTag(playerTag::PLAYER_ONE);
-	P2.setTag(playerTag::PLAYER_TWO);
+	vaos[4] = P1Score;
+	vaos[5] = P2Score;
+	
+	
 
 	// We'll use a vector to store all our key press events for now
 	std::vector<KeyPressWatcher> keyToggles;
