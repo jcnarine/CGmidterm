@@ -34,15 +34,16 @@
 #include "Utilities/VertexTypes.h"
 #include "CollisionDetection.h"
 #include "GameObject.h"
-<<<<<<< Updated upstream
-=======
-#include "Player.h"
+#include "Movement.h"
 #include <glm/gtx/io.hpp>
->>>>>>> Stashed changes
+#include <Puck.h>
+#include "main.h"
 
 #define LOG_GL_NOTIFICATIONS
+//https ://stackoverflow.com/questions/345838/ball-to-ball-collision-detection-and-handling
 
-Player P1, P2;
+Movement P1, P2;
+Puck puck;
 /*
 	Handles debug messages from OpenGL
 	https://www.khronos.org/opengl/wiki/Debug_Output#Message_Components
@@ -320,32 +321,101 @@ void ManipulateTransformWithInput(const Transform::sptr& transform, float dt) {
 	}
 }
 
-<<<<<<< Updated upstream
-=======
-void puckCollisionWithWall(objectTag t )
-{
-	std::cout<<("Collision");
-	system("CLS");
+float dot_product(glm::vec3 a, glm::vec3 b) {
+	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
+}
 
-	if (t== objectTag::BM_WALL){
+void puckCollisionWithPlayer(objectTag t){
 
-	}
-	else if (t== objectTag::T_WALL){
+	if (t== objectTag::P1){
+
+		vec3 collision = P1.getPosition() - puck.getPosition();
+		double distance = collision.length();
+
+		if (distance == 0.0) {              // hack to avoid div by zero
+
+			glm::vec3 collision = glm::vec3(1.0f, 0.0f, 0.0f);
+
+			double distance = 1.0;
+		}
+		if (distance > 1.0)
+			return;
 
 
-	}
-	else if (t== objectTag::LS_WALL){
+		vec3 paddleVelocity = P1.getVelocity();
+		vec3 puckVelocity = puck.getVelocity();
+
+		float aci = dot_product(paddleVelocity, collision);
+		float bci = dot_product(puckVelocity, collision);
+
+		float acf = bci;
+		float bcf = aci;
+
+		// Replace the collision velocity components with the new ones
+		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (acf - aci) * collision.x, paddleVelocity.y + (acf - aci) * collision.y, paddleVelocity.z);
+		P1.setVelocity(tempVelocity);
+
+		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (bcf - bci) * collision.x, paddleVelocity.y + (bcf - bci) * collision.y, paddleVelocity.z);
+		puck.setVelocity(tempVelocity);
 
 
-	}
-	else if(t== objectTag::RS_WALL){
+	}else if(t== objectTag::P2){
+
+		vec3 collision = P2.getPosition() - puck.getPosition();
+		double distance = collision.length();
+
+		if (distance == 0.0) {              // hack to avoid div by zero
+
+			glm::vec3 collision = glm::vec3(1.0f, 0.0f, 0.0f);
+
+			double distance = 1.0;
+		}
+		if (distance > 1.0)
+			return;
 
 
+		vec3 paddleVelocity = P2.getVelocity();
+		vec3 puckVelocity = puck.getVelocity();
+
+		float aci = dot_product(paddleVelocity, collision);
+		float bci = dot_product(puckVelocity, collision);
+
+		float acf = bci;
+		float bcf = aci;
+
+		// Replace the collision velocity components with the new ones
+		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (acf - aci) * collision.x, paddleVelocity.y + (acf - aci) * collision.y, paddleVelocity.z);
+		P2.setVelocity(tempVelocity);
+
+		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (bcf - bci) * collision.x, paddleVelocity.y + (bcf - bci) * collision.y, paddleVelocity.z);
+		puck.setVelocity(tempVelocity);
 	}
 
 }
 
->>>>>>> Stashed changes
+void puckCollisionWithWall(objectTag t )
+{
+	glm::vec3 tempVelocity;
+
+	if (t== objectTag::BM_WALL){
+	tempVelocity= glm::reflect(vec3(0,1,0), puck.getVelocity());
+	puck.setVelocity(tempVelocity);
+	}
+	else if (t== objectTag::T_WALL){
+	tempVelocity = glm::reflect(vec3(0,-1,0), puck.getVelocity());
+	puck.setVelocity(tempVelocity);
+	}
+	else if (t== objectTag::LS_WALL){
+	tempVelocity = glm::reflect(vec3(-1,0,0), puck.getVelocity());
+	puck.setVelocity(tempVelocity);
+	}
+	else if(t== objectTag::RS_WALL){
+	tempVelocity = glm::reflect(vec3(1,0,0), puck.getVelocity());
+	puck.setVelocity(tempVelocity);
+	}
+
+}
+
 struct Material
 {
 	Texture2D::sptr Albedo;
@@ -622,34 +692,30 @@ int main() {
 	// NEW STUFF
 
 	// Create some transforms and initialize them
-	Transform::sptr transforms[6];
+	Transform::sptr transforms[4];
 	transforms[0] = Transform::Create();
 	transforms[1] = Transform::Create();
 	transforms[2] = Transform::Create();
 	transforms[3] = Transform::Create();
-	transforms[4] = Transform::Create();
-	transforms[5] = Transform::Create();
-
-
 
 	// We can use operator chaining, since our Set* methods return a pointer to the instance, neat!
 	transforms[0]->SetLocalPosition(0.0f, 0.0f, 0.0f)->SetLocalRotation(90.0, 0.0f, 0.0f);
 	transforms[1]->SetLocalPosition(0.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
 	transforms[2]->SetLocalPosition(3.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
 	transforms[3]->SetLocalPosition(-3.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
-	transforms[4]->SetLocalPosition(-7.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
-	transforms[5]->SetLocalPosition(14.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
 
 	// We'll store all our VAOs into a nice array for easy access
-	VertexArrayObject::sptr vaos[6];
+	VertexArrayObject::sptr vaos[4];
 	vaos[0] = table;
 	vaos[1] = puck;
 	vaos[2] = player1;
 	vaos[3] = player2;
-	vaos[4] = P1Score;
-	vaos[5] = P2Score;
-	
-	
+
+	P1.setTransform(transforms[2]);
+	P2.setTransform(transforms[3]);
+
+	P1.setTag(playerTag::PLAYER_ONE);
+	P2.setTag(playerTag::PLAYER_TWO);
 
 	// We'll use a vector to store all our key press events for now
 	std::vector<KeyPressWatcher> keyToggles;
@@ -659,7 +725,7 @@ int main() {
 	// use std::bind
 	keyToggles.emplace_back(GLFW_KEY_T, [&](){ camera->ToggleOrtho(); });
 
-	int selectedVao = 0; // select cube by default
+	int selectedVao = 2; // select cube by default
 	keyToggles.emplace_back(GLFW_KEY_KP_ADD, [&]() {
 		selectedVao++;
 		if (selectedVao >= 4)
@@ -732,7 +798,7 @@ int main() {
 			bool cirCol = CollisionDetection::CheckSphereCollision(circles[ix], circles[0]);
 			objectTag cirtemp = circles[ix].GetTag();
 			if (cirCol) {
-			puckCollisionWithWall(cirtemp);
+			puckCollisionWithPlayer(cirtemp);
 			}
 		}
 
