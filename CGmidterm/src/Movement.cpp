@@ -10,7 +10,7 @@ Movement::~Movement()
 {
 }
 
-void Movement::movePlayer(){
+void Movement::movePlayer() {
 	//Calculation is done for acceleration
 	glm::fvec3 initialAcceleration = force / mass;
 
@@ -23,7 +23,7 @@ void Movement::movePlayer(){
 	//Friction Check Logic
 	if (isKeyPressed == false)
 	{
-		initialAcceleration*=friction;
+		initialAcceleration *= friction;
 
 	}
 
@@ -32,13 +32,14 @@ void Movement::movePlayer(){
 
 	//TODO: Put if loops for location of position, make clamp of x, y and z
 
-	if (player== playerTag::PLAYER_ONE){
-	
-	position= glm::vec3(std::clamp(position.x, 1.0f, 12.63f), std::clamp(position.y, -4.710f, 4.710f), position.z);
-	
-	}else if (player == playerTag::PLAYER_TWO){
-	
-	position = glm::vec3(std::clamp(position.x, -12.623f, -1.0f), std::clamp(position.y, -4.710f, 4.710f), position.z);
+	if (player == playerTag::PLAYER_ONE) {
+
+		position = glm::vec3(std::clamp(position.x, 1.0f, 12.63f), std::clamp(position.y, -4.710f, 4.710f), position.z);
+
+	}
+	else if (player == playerTag::PLAYER_TWO) {
+
+		position = glm::vec3(std::clamp(position.x, -12.623f, -1.0f), std::clamp(position.y, -4.710f, 4.710f), position.z);
 	}
 
 	//set the local position of the second 

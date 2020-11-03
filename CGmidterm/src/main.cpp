@@ -72,9 +72,9 @@ void GlDebugMessage(GLenum source, GLenum type, GLuint id, GLenum severity, GLsi
 	case GL_DEBUG_SEVERITY_LOW:          LOG_INFO("[{}] {}", sourceTxt, message); break;
 	case GL_DEBUG_SEVERITY_MEDIUM:       LOG_WARN("[{}] {}", sourceTxt, message); break;
 	case GL_DEBUG_SEVERITY_HIGH:         LOG_ERROR("[{}] {}", sourceTxt, message); break;
-		#ifdef LOG_GL_NOTIFICATIONS
+#ifdef LOG_GL_NOTIFICATIONS
 	case GL_DEBUG_SEVERITY_NOTIFICATION: LOG_INFO("[{}] {}", sourceTxt, message); break;
-		#endif
+#endif
 	default: break;
 	}
 }
@@ -96,7 +96,7 @@ bool initGLFW() {
 #ifdef _DEBUG
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 #endif
-	
+
 	//Create a new GLFW window
 	window = glfwCreateWindow(800, 800, "INFR1350U", nullptr, nullptr);
 	glfwMakeContextCurrent(window);
@@ -169,7 +169,7 @@ void RenderImGui() {
 		}
 		ImGui::End();
 	}
-	
+
 	// Make sure ImGui knows how big our window is
 	ImGuiIO& io = ImGui::GetIO();
 	int width{ 0 }, height{ 0 };
@@ -228,7 +228,7 @@ void Player1Input(float dt)
 	}
 
 	P1.movePlayer();
-	
+
 }
 
 void Player2Input(float dt)
@@ -262,56 +262,34 @@ void Player2Input(float dt)
 void ManipulateTransformWithInput(const Transform::sptr& transform, float dt) {
 
 	std::cout <<(transform->GetLocalPosition()) << std::endl;
+	system("CLS");
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		transform->MoveLocal( 5.0f * dt, 0.0f,  0.0f); 
+		transform->MoveLocal(5.0f * dt, 0.0f, 0.0f);
 	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { 
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
 		transform->MoveLocal(-5.0f * dt, 0.0f, 0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f, -5.0f * dt, 0.0f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f,  5.0f * dt, 0.0f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f, 0.0f,  5.0f * dt);
-	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f, 0.0f, -5.0f * dt);
-	}
-
-	/*std::cout <<(transform->GetLocalPosition()) << std::endl;
-	system("CLS");*/
-
-
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		transform->MoveLocal( 5.0f * dt, 0.0f,  0.0f); 
-	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { 
-		transform->MoveLocal(-5.0f * dt, 0.0f, 0.0f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f, 0.0f,  5.0f * dt);
+		transform->MoveLocal(0.0f, 0.0f, 5.0f * dt);
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
 		transform->MoveLocal(0.0f, 0.0f, -5.0f * dt);
 	}
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f,  5.0f * dt, 0.0f);
+		transform->MoveLocal(0.0f, 5.0f * dt, 0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
 		transform->MoveLocal(0.0f, -5.0f * dt, 0.0f);
 	}
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { 
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
 		transform->RotateLocal(0.0f, -45.0f * dt, 0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
-		transform->RotateLocal(0.0f,  45.0f * dt,0.0f);
+		transform->RotateLocal(0.0f, 45.0f * dt, 0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		transform->RotateLocal( 45.0f * dt, 0.0f,0.0f);
+		transform->RotateLocal(45.0f * dt, 0.0f, 0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
 		transform->RotateLocal(-45.0f * dt, 0.0f, 0.0f);
@@ -328,9 +306,9 @@ float dot_product(glm::vec3 a, glm::vec3 b) {
 	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
-void puckCollisionWithPlayer(objectTag t){
+void puckCollisionWithPlayer(objectTag t) {
 
-	if (t== objectTag::P1){
+	if (t == objectTag::P1) {
 
 		vec3 collision = P1.getPosition() - puckObject.getPosition();
 		double distance = collision.length();
@@ -358,11 +336,12 @@ void puckCollisionWithPlayer(objectTag t){
 		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (acf - aci) * collision.x, paddleVelocity.y + (acf - aci) * collision.y, paddleVelocity.z);
 		P1.setVelocity(tempVelocity);
 
-		 tempVelocity = glm::vec3(paddleVelocity.x + (bcf - bci) * collision.x, paddleVelocity.y + (bcf - bci) * collision.y, paddleVelocity.z);
+		tempVelocity = glm::vec3(paddleVelocity.x + (bcf - bci) * collision.x, paddleVelocity.y + (bcf - bci) * collision.y, paddleVelocity.z);
 		puckObject.setVelocity(tempVelocity);
 
 
-	}else if(t== objectTag::P2){
+	}
+	else if (t == objectTag::P2) {
 
 		vec3 collision = P2.getPosition() - puckObject.getPosition();
 		double distance = collision.length();
@@ -390,31 +369,31 @@ void puckCollisionWithPlayer(objectTag t){
 		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (acf - aci) * collision.x, paddleVelocity.y + (acf - aci) * collision.y, paddleVelocity.z);
 		P2.setVelocity(tempVelocity);
 
-		 tempVelocity = glm::vec3(paddleVelocity.x + (bcf - bci) * collision.x, paddleVelocity.y + (bcf - bci) * collision.y, paddleVelocity.z);
+		tempVelocity = glm::vec3(paddleVelocity.x + (bcf - bci) * collision.x, paddleVelocity.y + (bcf - bci) * collision.y, paddleVelocity.z);
 		puckObject.setVelocity(tempVelocity);
 	}
 
 }
 
-void puckCollisionWithWall(objectTag t )
+void puckCollisionWithWall(objectTag t)
 {
 	glm::vec3 tempVelocity;
 
-	if (t== objectTag::BM_WALL){
-	tempVelocity= glm::reflect(vec3(0,1,0), puckObject.getVelocity());
-	puckObject.setVelocity(tempVelocity);
+	if (t == objectTag::BM_WALL) {
+		tempVelocity = glm::reflect(vec3(0, 1, 0), puckObject.getVelocity());
+		puckObject.setVelocity(tempVelocity);
 	}
-	else if (t== objectTag::T_WALL){
-	tempVelocity = glm::reflect(vec3(0,-1,0), puckObject.getVelocity());
-	puckObject.setVelocity(tempVelocity);
+	else if (t == objectTag::T_WALL) {
+		tempVelocity = glm::reflect(vec3(0, -1, 0), puckObject.getVelocity());
+		puckObject.setVelocity(tempVelocity);
 	}
-	else if (t== objectTag::LS_WALL){
-	tempVelocity = glm::reflect(vec3(-1,0,0), puckObject.getVelocity());
-	puckObject.setVelocity(tempVelocity);
+	else if (t == objectTag::LS_WALL) {
+		tempVelocity = glm::reflect(vec3(-1, 0, 0), puckObject.getVelocity());
+		puckObject.setVelocity(tempVelocity);
 	}
-	else if(t== objectTag::RS_WALL){
-	tempVelocity = glm::reflect(vec3(1,0,0), puckObject.getVelocity());
-	puckObject.setVelocity(tempVelocity);
+	else if (t == objectTag::RS_WALL) {
+		tempVelocity = glm::reflect(vec3(1, 0, 0), puckObject.getVelocity());
+		puckObject.setVelocity(tempVelocity);
 	}
 
 }
@@ -448,30 +427,27 @@ int main() {
 
 	// Enable texturing
 	glEnable(GL_TEXTURE_2D);
-	
+
 	VertexArrayObject::sptr table = ObjLoader::LoadFromFile("Objects/AirHockeyTable.obj");
 	VertexArrayObject::sptr puck = ObjLoader::LoadFromFile("Objects/AirHockeyPuck.obj");
 	VertexArrayObject::sptr player1 = ObjLoader::LoadFromFile("Objects/AirHockeyPad.obj");
 	VertexArrayObject::sptr player2 = ObjLoader::LoadFromFile("Objects/AirHockeyPad.obj");
-	VertexArrayObject::sptr P1Score = ObjLoader::LoadFromFile("Objects/ScoreCounter-0-FINAL.obj");
-	VertexArrayObject::sptr P2Score = ObjLoader::LoadFromFile("Objects/ScoreCounter-0-FINAL.obj");
-	
-	//ScoreUI objects sets the current OBJ
-	score_1.setCurrentVAO(P1Score);
-	score_2.setCurrentVAO(P2Score);
 
+	VertexArrayObject::sptr P1Score[10];
+	VertexArrayObject::sptr P2Score[10];
 
-	//ADD THE REST OF THE OBJ'S
-	//ADD NEW MATERIAL FOR SECOND SCORE
-	//LOOK INTO REASSIGNING OBJ FILE 
-	//if statment with score as a varilable and load in different objects
-	//Score += 1 within function adn update score accordingly
-		
+	for (int i= 0; i<6; i++){
+	P1Score[i]=ObjLoader::LoadFromFile("Objects/Score/"+std::to_string(i)+".obj");
+	}
+	for (int i = 0; i < 6; i++) {
+	P2Score[i]=ObjLoader::LoadFromFile("Objects/Score/" + std::to_string(i) + ".obj");
+	}
+
 	// Load our shaders
 	Shader::sptr shader = Shader::Create();
 	shader->LoadShaderPartFromFile("Shaders/vertex_shader.glsl", GL_VERTEX_SHADER);
-	shader->LoadShaderPartFromFile("Shaders/frag_blinn_phong_textured.glsl", GL_FRAGMENT_SHADER);  
-	shader->Link();  
+	shader->LoadShaderPartFromFile("Shaders/frag_blinn_phong_textured.glsl", GL_FRAGMENT_SHADER);
+	shader->Link();
 
 	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 5.0f);
 	glm::vec3 lightCol = glm::vec3(0.0f, 0.45f, 0.94f);
@@ -482,7 +458,7 @@ int main() {
 	float     shininess = 0.0f;
 	float     lightLinearFalloff = 0.260f;
 	float     lightQuadraticFalloff = 0.070f;
-	
+
 	// TODO: load textures
 
 #pragma region Texture
@@ -502,7 +478,7 @@ int main() {
 	//Texture2D::sptr paddleTexture = Texture2D::Create(PaddleDesc);
 	//paddleTexture->Clear();
 
-#pragma endregion TableTexture
+#pragma endregion PaddleTexture
 
 #pragma region Texture
 // Load our texture data from a file
@@ -524,7 +500,7 @@ int main() {
 #pragma endregion TableTexture
 
 #pragma region Texture
-// Load our texture data from a file
+	// Load our texture data from a file
 	Texture2DData::sptr plasticDiffuseMap = Texture2DData::LoadFromFile("Images/Plastic_Diffuse.png");
 	Texture2DData::sptr specularDiffuseMap = Texture2DData::LoadFromFile("Images/Plastic_Specular.png");
 	// Create a texture from the data
@@ -543,20 +519,6 @@ int main() {
 #pragma endregion PlasticTexture
 
 #pragma region Texture
-
-	Texture2DData::sptr boxDiffuseMap = Texture2DData::LoadFromFile("Images/box.bmp");
-	Texture2D::sptr boxDiffuse = Texture2D::Create();
-	boxDiffuse->LoadData(boxDiffuseMap);
-	Texture2DDescription boxDesc = Texture2DDescription();
-	boxDesc.Width = 1;
-	boxDesc.Height = 1;
-	boxDesc.Format = InternalFormat::RGB8;
-	Texture2D::sptr texture3 = Texture2D::Create(boxDesc);
-	texture3->Clear();
-
-#pragma endregion BoxTexture
-
-#pragma region Texture
 	Texture2DData::sptr P2scoreDiffuseMap = Texture2DData::LoadFromFile("Images/Red Color.jpg");
 	Texture2DData::sptr scoreSpecularMap = Texture2DData::LoadFromFile("Images/Red Color.jpg");
 	// Create a texture from the data
@@ -572,7 +534,7 @@ int main() {
 	Texture2D::sptr P2scoreTexture = Texture2D::Create(P2scoreDesc);
 	P2scoreTexture->Clear();
 
-#pragma endregion Score Texture
+#pragma endregion RedScoreTexture
 
 #pragma region Texture
 	Texture2DData::sptr P1scoreDiffuseMap = Texture2DData::LoadFromFile("Images/Light Blue.jpg");
@@ -590,49 +552,51 @@ int main() {
 	Texture2D::sptr P1scoreTexture = Texture2D::Create(P1scoreDesc);
 	P1scoreTexture->Clear();
 
-#pragma endregion Score Texture
+#pragma endregion BlueScoreTexture
+
 	// TODO: store some info about our materials for each object
 
+#pragma region Materials
 	// We'll use a temporary lil structure to store some info about our material (we'll expand this later)
 	Material materials[6];
 
 	materials[0].Albedo = tableDiffuse;
 	materials[0].Specular = tableSpecular;
-	materials[0].DiffuseTexture = boxDiffuse;
+	materials[0].DiffuseTexture = plasticDiffuse;
 	materials[0].Shininess = 4.0f;
 	materials[0].TextureMix = 0.0;
 
 	materials[1].Albedo = plasticDiffuse;
 	materials[1].Specular = plasticSpecular;
-	materials[1].DiffuseTexture = boxDiffuse;
+	materials[1].DiffuseTexture = plasticDiffuse;
 	materials[1].Shininess = 32.0f;
 	materials[1].TextureMix = 0.0f;
 
 	materials[2].Albedo = plasticDiffuse;
 	materials[2].Specular = plasticSpecular;
-	materials[2].DiffuseTexture = boxDiffuse;
+	materials[2].DiffuseTexture = plasticDiffuse;
 	materials[2].Shininess = 32.0f;
 	materials[2].TextureMix = 0.0f;
 
-
 	materials[3].Albedo = plasticDiffuse;
 	materials[3].Specular = plasticSpecular;
-	materials[3].DiffuseTexture = boxDiffuse;
+	materials[3].DiffuseTexture = plasticDiffuse;
 	materials[3].Shininess = 32.0f;
 	materials[3].TextureMix = 0.0f;
 
 	materials[4].Albedo = P2scoreDiffuse;
 	materials[4].Specular = P2scoreSpecular;
-	materials[4].DiffuseTexture = boxDiffuse;
+	materials[4].DiffuseTexture = plasticDiffuse;
 	materials[4].Shininess = 32.0f;
 	materials[4].TextureMix = 0.0f;
 
 	materials[5].Albedo = P1scoreDiffuse;
 	materials[5].Specular = P1scoreSpecular;
-	materials[5].DiffuseTexture = boxDiffuse;
+	materials[5].DiffuseTexture = plasticDiffuse;
 	materials[5].Shininess = 32.0f;
 	materials[5].TextureMix = 0.0f;
 
+#pragma endregion
 
 	camera = Camera::Create();
 	camera->SetPosition(glm::vec3(0, 3, 18)); // Set initial position
@@ -661,10 +625,10 @@ int main() {
 				shader->SetUniform("u_AmbientCol", ambientCol);
 			}
 			if (ImGui::SliderFloat("Fixed Ambient Power", &ambientPow, 0.01f, 1.0f)) {
-				shader->SetUniform("u_AmbientStrength", ambientPow); 
+				shader->SetUniform("u_AmbientStrength", ambientPow);
 			}
 		}
-		if (ImGui::CollapsingHeader("Light Level Lighting Settings")) 
+		if (ImGui::CollapsingHeader("Light Level Lighting Settings"))
 		{
 			if (ImGui::DragFloat3("Light Pos", glm::value_ptr(lightPos), 0.01f, -10.0f, 10.0f)) {
 				shader->SetUniform("u_LightPos", lightPos);
@@ -694,7 +658,7 @@ int main() {
 				shader->SetUniform("u_Shininess", materials[1].Shininess);
 			}
 		}
-	});
+		});
 
 	// GL states
 	glEnable(GL_DEPTH_TEST);
@@ -702,6 +666,7 @@ int main() {
 
 	// NEW STUFF
 
+	#pragma region Transform
 	// Create some transforms and initialize them
 	Transform::sptr transforms[6];
 	transforms[0] = Transform::Create();
@@ -719,7 +684,9 @@ int main() {
 	transforms[2]->SetLocalPosition(3.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
 	transforms[3]->SetLocalPosition(-3.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
 	transforms[4]->SetLocalPosition(-7.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
-	transforms[5]->SetLocalPosition(14.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
+	transforms[5]->SetLocalPosition(7.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
+
+	#pragma endregion 
 
 	// We'll store all our VAOs into a nice array for easy access
 	VertexArrayObject::sptr vaos[6];
@@ -727,17 +694,13 @@ int main() {
 	vaos[1] = puck;
 	vaos[2] = player1;
 	vaos[3] = player2;
-	vaos[4] = P1Score;
-	vaos[5] = P2Score;
-	
+
 	puckObject.setTransform(transforms[1]);
 	P1.setTransform(transforms[2]);
 	P2.setTransform(transforms[3]);
-
-	puckObject.setTransform(transforms[3]);
+	
 	P1.setTag(playerTag::PLAYER_ONE);
 	P2.setTag(playerTag::PLAYER_TWO);
-	
 
 	// We'll use a vector to store all our key press events for now
 	std::vector<KeyPressWatcher> keyToggles;
@@ -745,28 +708,26 @@ int main() {
 	// how this is implemented. Note that the ampersand here is capturing the variables within
 	// the scope. If you wanted to do some method on the class, your best bet would be to give it a method and
 	// use std::bind
-	keyToggles.emplace_back(GLFW_KEY_T, [&](){ camera->ToggleOrtho(); });
+	keyToggles.emplace_back(GLFW_KEY_T, [&]() { camera->ToggleOrtho(); });
 
 	int selectedVao = 2; // select cube by default
 	keyToggles.emplace_back(GLFW_KEY_KP_ADD, [&]() {
 		selectedVao++;
 		if (selectedVao >= 4)
 			selectedVao = 1;
-	});
+		});
 	keyToggles.emplace_back(GLFW_KEY_KP_SUBTRACT, [&]() {
 		selectedVao--;
 		if (selectedVao <= 0)
 			selectedVao = 3;
-	});
-
-
+		});
 
 	InitImGui();
-		
+
 	std::vector<GameObject> boxes;
 	std::vector<GameObject> circles;
 
-	#pragma region GameObject Creation
+#pragma region GameObject Creation
 
 	boxes.push_back(GameObject(glm::vec3(0, 4.9, 0), objectTag::T_WALL));
 	boxes.push_back(GameObject(glm::vec3(0, -4.9, 0), objectTag::BM_WALL));
@@ -777,11 +738,11 @@ int main() {
 	circles.push_back(GameObject(glm::vec3(3.0f, 0.0f, 4.45f), objectTag::P1));
 	circles.push_back(GameObject(glm::vec3(-3.0f, 0.0f, 4.45f), objectTag::P2));
 
-	#pragma endregion  
+#pragma endregion  
 
 	// Our high-precision timer
 	double lastFrame = glfwGetTime();
-	
+
 	///// Game loop /////
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -798,10 +759,10 @@ int main() {
 			for (const KeyPressWatcher& watcher : keyToggles) {
 				watcher.Poll(window);
 			}
-			Player1Input(dt);
-			Player2Input(dt);
+			/*Player1Input(dt);
+			Player2Input(dt);*/
 			// We'll run some basic input to move our transform around
-			//ManipulateTransformWithInput(transforms[selectedVao], dt);
+			ManipulateTransformWithInput(transforms[selectedVao], dt);
 		}
 
 		glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
@@ -812,10 +773,10 @@ int main() {
 		circles[2].UpdatePosition(transforms[3]->GetLocalPosition());
 
 		objectTag boxCol = CollisionDetection::CheckWallCollision(circles[0]);
-		if (!(boxCol== objectTag::NONE)){
-		puckCollisionWithWall(boxCol);
+		if (!(boxCol == objectTag::NONE)) {
+			puckCollisionWithWall(boxCol);
 		}
-		
+
 		for (int ix = 1; ix <= 2; ix++) {
 			bool cirCol = CollisionDetection::CheckSphereCollision(circles[ix], circles[0]);
 			objectTag cirtemp = circles[ix].GetTag();
@@ -824,18 +785,19 @@ int main() {
 			}
 		}
 
+
 		shader->Bind();
 		// These are the uniforms that update only once per frame
 		shader->SetUniformMatrix("u_View", camera->GetView());
 		shader->SetUniform("u_CamPos", camera->GetPosition());
 
 		// Tell OpenGL that slot 0 will hold the diffuse, and slot 1 will hold the specular
-		shader->SetUniform("s_Diffuse",  0);
-		shader->SetUniform("s_Specular", 1); 
+		shader->SetUniform("s_Diffuse", 0);
+		shader->SetUniform("s_Specular", 1);
 		shader->SetUniform("s_Diffuse2", 2);
-		
+
 		// Render all VAOs in our scene
-		for(int ix = 0; ix < 6; ix++) {
+		for (int ix = 0; ix < 4; ix++) {
 			// TODO: Apply materials
 			// Apply material properties for each instance
 			materials[ix].Albedo->Bind(0);
@@ -843,9 +805,35 @@ int main() {
 			materials[ix].DiffuseTexture->Bind(2);
 			shader->SetUniform("u_Shininess", materials[ix].Shininess);
 			shader->SetUniform("u_TextureMix", materials[ix].TextureMix);
-			RenderVAO(shader, vaos[ix], camera, transforms[ix]);			
+			RenderVAO(shader, vaos[ix], camera, transforms[ix]);
 		}
 
+
+		if (puckObject.getPosition().x > 15.013) {
+			puckObject.respawnPuck(playerTag::PLAYER_ONE);
+			score_2.updateScore();
+
+		}
+		else if (puckObject.getPosition().x < -15.013) {
+			puckObject.respawnPuck(playerTag::PLAYER_TWO);
+			score_1.updateScore();
+		}
+
+		materials[4].Albedo->Bind(0);
+		materials[4].Specular->Bind(1);
+		materials[4].DiffuseTexture->Bind(2);
+		shader->SetUniform("u_Shininess", materials[4].Shininess);
+		shader->SetUniform("u_TextureMix", materials[4].TextureMix);
+
+		RenderVAO(shader, P2Score[score_2.getTotalScore()], camera, transforms[4]);
+
+		materials[5].Albedo->Bind(0);
+		materials[5].Specular->Bind(1);
+		materials[5].DiffuseTexture->Bind(2);
+		shader->SetUniform("u_Shininess", materials[5].Shininess);
+		shader->SetUniform("u_TextureMix", materials[5].TextureMix);
+
+		RenderVAO(shader, P1Score[score_1.getTotalScore()], camera, transforms[5]);
 		RenderImGui();
 
 		glfwSwapBuffers(window);

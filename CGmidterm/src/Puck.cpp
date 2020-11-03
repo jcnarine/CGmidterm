@@ -43,11 +43,9 @@ void Puck::movePuck()
 void Puck::respawnPuck(playerTag p)
 {
 	if (p== playerTag::PLAYER_ONE){
-		transform->SetLocalPosition(0.0f, 0.0f, 0.0f);
-		initialAcceleration = vec3(1,0,0);
+		transform->SetLocalPosition(1.0f, 0.0f, 4.45f);
 	}
 	else if (p == playerTag::PLAYER_TWO) {
-		transform->SetLocalPosition(0.0f, 0.0f, 0.0f);
-		initialAcceleration = vec3(1, 0, 0);
+		transform->SetLocalPosition(-1.0f, 0.0f, 4.45f);
 	}
 }
