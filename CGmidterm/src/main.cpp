@@ -34,16 +34,12 @@
 #include "Utilities/VertexTypes.h"
 #include "CollisionDetection.h"
 #include "GameObject.h"
-#include "Movement.h"
-#include <glm/gtx/io.hpp>
-#include <Puck.h>
-#include "main.h"
+
 
 #define LOG_GL_NOTIFICATIONS
 //https ://stackoverflow.com/questions/345838/ball-to-ball-collision-detection-and-handling
 
-Movement P1, P2;
-Puck puck;
+
 /*
 	Handles debug messages from OpenGL
 	https://www.khronos.org/opengl/wiki/Debug_Output#Message_Components
@@ -257,7 +253,6 @@ void Player2Input(float dt)
 }
 
 void ManipulateTransformWithInput(const Transform::sptr& transform, float dt) {
-<<<<<<< Updated upstream
 	std::cout <<(transform->GetLocalPosition()) << std::endl;
 
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
@@ -283,24 +278,6 @@ void ManipulateTransformWithInput(const Transform::sptr& transform, float dt) {
 	system("CLS");*/
 >>>>>>> Stashed changes
 
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-		transform->MoveLocal( 5.0f * dt, 0.0f,  0.0f); 
-	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { 
-		transform->MoveLocal(-5.0f * dt, 0.0f, 0.0f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f, 0.0f,  5.0f * dt);
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f, 0.0f, -5.0f * dt);
-	}
-	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f,  5.0f * dt, 0.0f);
-	}
-	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-		transform->MoveLocal(0.0f, -5.0f * dt, 0.0f);
-	}
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { 
 		transform->RotateLocal(0.0f, -45.0f * dt, 0.0f);
 	}
@@ -319,101 +296,6 @@ void ManipulateTransformWithInput(const Transform::sptr& transform, float dt) {
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
 		transform->RotateLocal(0.0f, 0.0f, -45.0f * dt);
 	}
-}
-
-float dot_product(glm::vec3 a, glm::vec3 b) {
-	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
-}
-
-void puckCollisionWithPlayer(objectTag t){
-
-	if (t== objectTag::P1){
-
-		vec3 collision = P1.getPosition() - puck.getPosition();
-		double distance = collision.length();
-
-		if (distance == 0.0) {              // hack to avoid div by zero
-
-			glm::vec3 collision = glm::vec3(1.0f, 0.0f, 0.0f);
-
-			double distance = 1.0;
-		}
-		if (distance > 1.0)
-			return;
-
-
-		vec3 paddleVelocity = P1.getVelocity();
-		vec3 puckVelocity = puck.getVelocity();
-
-		float aci = dot_product(paddleVelocity, collision);
-		float bci = dot_product(puckVelocity, collision);
-
-		float acf = bci;
-		float bcf = aci;
-
-		// Replace the collision velocity components with the new ones
-		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (acf - aci) * collision.x, paddleVelocity.y + (acf - aci) * collision.y, paddleVelocity.z);
-		P1.setVelocity(tempVelocity);
-
-		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (bcf - bci) * collision.x, paddleVelocity.y + (bcf - bci) * collision.y, paddleVelocity.z);
-		puck.setVelocity(tempVelocity);
-
-
-	}else if(t== objectTag::P2){
-
-		vec3 collision = P2.getPosition() - puck.getPosition();
-		double distance = collision.length();
-
-		if (distance == 0.0) {              // hack to avoid div by zero
-
-			glm::vec3 collision = glm::vec3(1.0f, 0.0f, 0.0f);
-
-			double distance = 1.0;
-		}
-		if (distance > 1.0)
-			return;
-
-
-		vec3 paddleVelocity = P2.getVelocity();
-		vec3 puckVelocity = puck.getVelocity();
-
-		float aci = dot_product(paddleVelocity, collision);
-		float bci = dot_product(puckVelocity, collision);
-
-		float acf = bci;
-		float bcf = aci;
-
-		// Replace the collision velocity components with the new ones
-		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (acf - aci) * collision.x, paddleVelocity.y + (acf - aci) * collision.y, paddleVelocity.z);
-		P2.setVelocity(tempVelocity);
-
-		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (bcf - bci) * collision.x, paddleVelocity.y + (bcf - bci) * collision.y, paddleVelocity.z);
-		puck.setVelocity(tempVelocity);
-	}
-
-}
-
-void puckCollisionWithWall(objectTag t )
-{
-	glm::vec3 tempVelocity;
-
-	if (t== objectTag::BM_WALL){
-	tempVelocity= glm::reflect(vec3(0,1,0), puck.getVelocity());
-	puck.setVelocity(tempVelocity);
-	}
-	else if (t== objectTag::T_WALL){
-	tempVelocity = glm::reflect(vec3(0,-1,0), puck.getVelocity());
-	puck.setVelocity(tempVelocity);
-	}
-	else if (t== objectTag::LS_WALL){
-	tempVelocity = glm::reflect(vec3(-1,0,0), puck.getVelocity());
-	puck.setVelocity(tempVelocity);
-	}
-	else if(t== objectTag::RS_WALL){
-	tempVelocity = glm::reflect(vec3(1,0,0), puck.getVelocity());
-	puck.setVelocity(tempVelocity);
-	}
-
 }
 
 struct Material
@@ -724,9 +606,10 @@ int main() {
 	vaos[1] = puck;
 	vaos[2] = player1;
 	vaos[3] = player2;
-	vaos[4] = P1Score;
-	vaos[5] = P2Score;
-	
+
+	puckObject.setTransform(transforms[3]);
+	P1.setTag(playerTag::PLAYER_ONE);
+	P2.setTag(playerTag::PLAYER_TWO);
 	
 
 	// We'll use a vector to store all our key press events for now
@@ -788,10 +671,9 @@ int main() {
 			for (const KeyPressWatcher& watcher : keyToggles) {
 				watcher.Poll(window);
 			}
-			/*Player1Input(dt);
-			Player2Input(dt);*/
+
 			// We'll run some basic input to move our transform around
-			ManipulateTransformWithInput(transforms[selectedVao], dt);
+			//ManipulateTransformWithInput(transforms[selectedVao], dt);
 		}
 
 		glClearColor(0.08f, 0.17f, 0.31f, 1.0f);

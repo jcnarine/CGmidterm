@@ -1,5 +1,12 @@
 #include "Puck.h"
 
+<<<<<<< HEAD
+=======
+Puck::Puck()
+{
+}
+
+>>>>>>> Chris
 Puck::Puck(Transform::sptr& t, float m){
 
 transform = t;
