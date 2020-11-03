@@ -23,22 +23,14 @@ public:
     ~Movement();
     void setTag(playerTag p) { player = p; };
 	void setVelocity(glm::vec3 v) {initialVelocity = v;};
-<<<<<<< HEAD
-    void setTransform(Transform::sptr& t){transform=t;};
-=======
     void setTransform(Transform::sptr& t){transform = t;};
->>>>>>> Chris
     void setForce(vec3 f) { force=f;};
     void setDt(float d) { deltaTime = d; };
     void applyForce(vec3 f){force+=f;};
     void setKeyPressed(bool k){isKeyPressed=k;};
     void movePlayer();
 	glm::vec3 getVelocity() { return initialVelocity; };
-<<<<<<< HEAD
-	glm::vec3 getPosition(){return transform->GetLocalPosition()};
-=======
 	glm::vec3 getPosition() { return transform->GetLocalPosition(); };
->>>>>>> Chris
 
 protected:
 

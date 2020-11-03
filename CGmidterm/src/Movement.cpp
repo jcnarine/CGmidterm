@@ -2,13 +2,10 @@
 
 //https://gamedev.stackexchange.com/questions/4673/how-do-i-implement-deceleration
 
-<<<<<<< HEAD
-=======
 Movement::Movement()
 {
 }
 
->>>>>>> Chris
 Movement::~Movement()
 {
 }

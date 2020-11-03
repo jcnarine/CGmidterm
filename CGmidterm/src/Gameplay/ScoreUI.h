@@ -16,14 +16,11 @@ public:
 
 	void SetPlayerScore();
 
-<<<<<<< HEAD
-=======
 	void ScoreUI::setTotalScore(int total);
 
 	int ScoreUI::getTotalScore();
 	
 
->>>>>>> Chris
 
 private:
 
