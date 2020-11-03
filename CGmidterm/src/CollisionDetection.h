@@ -3,19 +3,17 @@
 
 #include <memory>
 #include "GameObject.h"
+#include "Gameplay/ScoreUI.h"
 #include <GLM/glm.hpp>
 #include <string>
 using namespace std;
 
-class CollisionDetection
+class CollisionDetection : public ScoreUI
 {
 
 public:
-
-	static void CheckCollision(GameObject& one, GameObject& two);
-	static bool CheckSphereCollision(GameObject& one, GameObject& two);
-	//Sphere - Sphere collision
-	static bool CheckWallCollision(GameObject& one, GameObject& two); // Sphere - AABB collision
+	static bool CheckSphereCollision(GameObject& one, GameObject& two); //Sphere - Sphere collision
+	static objectTag CheckWallCollision(GameObject& puck);
 };
 
 

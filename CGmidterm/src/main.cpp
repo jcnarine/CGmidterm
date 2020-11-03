@@ -1,12 +1,14 @@
+
+#define GLM_ENABLE_EXPERIMENTAL
+
 #include <Logging.h>
 #include <iostream>
-#define GLM_ENABLE_EXPERIMENTAL
+
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <filesystem>
 #include <json.hpp>
 #include <fstream>
-#include <glm/gtx/io.hpp>
 
 #include <GLM/glm.hpp>
 #include <GLM/gtc/matrix_transform.hpp>
@@ -21,6 +23,7 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 #include "Gameplay/Transform.h"
+#include "Gameplay/ScoreUI.h"
 #include "Graphics/Texture2D.h"
 #include "Graphics/Texture2DData.h"
 #include "Utilities/InputHelpers.h"
@@ -31,19 +34,19 @@
 #include "Utilities/VertexTypes.h"
 #include "CollisionDetection.h"
 #include "GameObject.h"
-
-using namespace glm;
-
-//vec2 for the force of the object, initalized to zero along the x and y
-glm::fvec3 force = glm::vec3(0.0f, 0.0f, 0.0f);
-
-//Velocity
-glm::fvec3 initialVelocity = glm::vec3(0.0f, 0.0f, 0.0f);
+#include "Movement.h"
+#include <glm/gtx/io.hpp>
+#include <Puck.h>
 
 
 #define LOG_GL_NOTIFICATIONS
+//https ://stackoverflow.com/questions/345838/ball-to-ball-collision-detection-and-handling
 
+Movement P1, P2;
 
+Puck puckObject;
+
+ScoreUI score_1, score_2;
 /*
 	Handles debug messages from OpenGL
 	https://www.khronos.org/opengl/wiki/Debug_Output#Message_Components
@@ -187,6 +190,7 @@ void RenderImGui() {
 	}
 }
 
+
 void RenderVAO(
 	const Shader::sptr& shader,
 	const VertexArrayObject::sptr& vao,
@@ -199,125 +203,221 @@ void RenderVAO(
 	vao->Render();
 }
 
-void ManipulateTransformWithInput(const Transform::sptr& transform, float dt) {
-	std::cout <<(transform->GetLocalPosition()) << std::endl;
+void Player1Input(float dt)
+{
+	P1.setKeyPressed(false);
+	P1.setDt(dt);
 
-	glm::mat4 Model = glm::mat4(1.0f);
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		P1.setKeyPressed(true);
+		P1.applyForce(glm::vec3(15.0f, 0.0f, 0.0f));
+	}
 
-	//if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
-	//	transform->MoveLocal( 5.0f * dt, 0.0f,  0.0f); 
-	//}
-	//if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { 
-	//	transform->MoveLocal(-5.0f * dt, 0.0f, 0.0f);
-	//}
-	//if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-	//	transform->MoveLocal(0.0f, 0.0f,  5.0f * dt);
-	//}
-	//if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-	//	transform->MoveLocal(0.0f,  0.0f, -5.0f * dt);
-	//}
-	//if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-	//	transform->MoveLocal(0.0f, 5.0f * dt, 0.0f);
-	//}
-	//if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-	//	transform->MoveLocal(0.0f, -5.0f * dt, 0.0f );
-	//}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+		P1.setKeyPressed(true);
+		P1.applyForce(glm::vec3(-15.0f, 0.0f, 0.0f));
+	}
 
-	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { 
-		
-		transform->MoveLocal(0.0f, 0.0f, 5.0f * dt);
-		//transform->RotateLocal(0.0f, -45.0f * dt, 0.0f);
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		P1.setKeyPressed(true);
+		P1.applyForce(glm::vec3(0.0f, -15.0f, 0.0f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		P1.setKeyPressed(true);
+		P1.applyForce(glm::vec3(0.0f, 15.0f, 0.0f));
+	}
+
+	P1.movePlayer();
+	
+}
+
+void Player2Input(float dt)
+{
+	P2.setKeyPressed(false);
+	P2.setDt(dt);
+
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+		P2.setKeyPressed(true);
+		P2.applyForce(glm::vec3(15.0f, 0.0f, 0.0f));
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+		P2.setKeyPressed(true);
+		P2.applyForce(glm::vec3(-15.0f, 0.0f, 0.0f));
+	}
+
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		P2.setKeyPressed(true);
+		P2.applyForce(glm::vec3(0.0f, -15.0f, 0.0f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		P2.setKeyPressed(true);
+		P2.applyForce(glm::vec3(0.0f, 15.0f, 0.0f));
+	}
+
+	P2.movePlayer();
+
+}
+
+void ManipulateTransformWithInput(const Transform::sptr& transform, float dt) {
+
+	std::cout <<(transform->GetLocalPosition()) << std::endl;
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		transform->MoveLocal( 5.0f * dt, 0.0f,  0.0f); 
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { 
+		transform->MoveLocal(-5.0f * dt, 0.0f, 0.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		transform->MoveLocal(0.0f, -5.0f * dt, 0.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		transform->MoveLocal(0.0f,  5.0f * dt, 0.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		transform->MoveLocal(0.0f, 0.0f,  5.0f * dt);
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
 		transform->MoveLocal(0.0f, 0.0f, -5.0f * dt);
-		//transform->RotateLocal(0.0f,  45.0f * dt,0.0f);
+	}
+
+	/*std::cout <<(transform->GetLocalPosition()) << std::endl;
+	system("CLS");*/
+
+
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+		transform->MoveLocal( 5.0f * dt, 0.0f,  0.0f); 
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) { 
+		transform->MoveLocal(-5.0f * dt, 0.0f, 0.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		transform->MoveLocal(0.0f, 0.0f,  5.0f * dt);
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+		transform->MoveLocal(0.0f, 0.0f, -5.0f * dt);
+	}
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		transform->MoveLocal(0.0f,  5.0f * dt, 0.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+		transform->MoveLocal(0.0f, -5.0f * dt, 0.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) { 
+		transform->RotateLocal(0.0f, -45.0f * dt, 0.0f);
+	}
+	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+		transform->RotateLocal(0.0f,  45.0f * dt,0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-		transform->MoveLocal(5.0f * dt, 0.0f, 0.0f);
-		//transform->RotateLocal( 45.0f * dt, 0.0f,0.0f);
+		transform->RotateLocal( 45.0f * dt, 0.0f,0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-		transform->MoveLocal(-5.0f * dt, 0.0f, 0.0f);
-		//transform->RotateLocal(-45.0f * dt, 0.0f, 0.0f);
+		transform->RotateLocal(-45.0f * dt, 0.0f, 0.0f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
-		
-		//transform->RotateLocal(0.0f, 0.0f, 45.0f * dt);
+		transform->RotateLocal(0.0f, 0.0f, 45.0f * dt);
 	}
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
 		transform->RotateLocal(0.0f, 0.0f, -45.0f * dt);
 	}
 }
 
-
-void Player1Input(const Transform::sptr& transform, float dt)
-{
-	std::cout << (transform->GetLocalPosition()) << std::endl;
-	
-	//float variable that initilaizes the mass of the puck
-	float mass = 5.0f;
-
-	//
-	glm::vec3 newVelocity = glm::vec3(0.0f, 0.0f, 0.0f);
-
-	//friction variable 
-	const float friciton = 0.45f;
-
-	//Bool variable that checks 
-	bool isKeyPressed = false;
-
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_A) != GLFW_RELEASE) {
-		force += glm::vec3(15.0f, 0.0f, 0.0f);
-		isKeyPressed = true;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_D) != GLFW_RELEASE) {
-		force += glm::vec3(-15.0f, 0.0f, 0.0f);
-		isKeyPressed = true;
-	}
-
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_W) != GLFW_RELEASE) {
-		force += glm::vec3(0.0f, -15.0f, 0.0f);
-		isKeyPressed = true;
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS && glfwGetKey(window, GLFW_KEY_S) != GLFW_RELEASE) {
-		force += glm::vec3(0.0f, 15.0f, 0.0f);
-		isKeyPressed = true;
-	}
-	else
-	{
-		isKeyPressed = false;
-	}
-
-
-
-	//Calculation is done for acceleration
-	glm::fvec3 initialAcceleration = force / mass;
-	
-	//Calculate maginitude
-	glm::vec3 Magnitude = (sqrt(transform->GetLocalPosition()));
-
-	//Calculate velocity
-	newVelocity = initialVelocity + (initialAcceleration * dt);
-	
-	//Friction Check Logic
-	if (isKeyPressed == false && (initialAcceleration.x > 1.0f))
-	{
-		initialAcceleration *= friciton;
-	}
-
-
-	//Calculates the position
-	glm::vec3 position = transform->GetLocalPosition() + (glm::vec3(newVelocity.x, newVelocity.y, newVelocity.z) * dt) + (glm::vec3(initialAcceleration.x, initialAcceleration.y, initialAcceleration.z) * (0.5f) * (dt * dt));
-	
-	
-	//set the local position of the second paddle
-	transform->SetLocalPosition(position.x, position.y, position.z);
-
-
-		
+float dot_product(glm::vec3 a, glm::vec3 b) {
+	return (a.x * b.x) + (a.y * b.y) + (a.z * b.z);
 }
 
+void puckCollisionWithPlayer(objectTag t){
+
+	if (t== objectTag::P1){
+
+		vec3 collision = P1.getPosition() - puckObject.getPosition();
+		double distance = collision.length();
+
+		if (distance == 0.0) {              // hack to avoid div by zero
+
+			glm::vec3 collision = glm::vec3(1.0f, 0.0f, 0.0f);
+
+			double distance = 1.0;
+		}
+		if (distance > 1.0)
+			return;
+
+
+		vec3 paddleVelocity = P1.getVelocity();
+		vec3 puckVelocity = puckObject.getVelocity();
+
+		float aci = dot_product(paddleVelocity, collision);
+		float bci = dot_product(puckVelocity, collision);
+
+		float acf = bci;
+		float bcf = aci;
+
+		// Replace the collision velocity components with the new ones
+		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (acf - aci) * collision.x, paddleVelocity.y + (acf - aci) * collision.y, paddleVelocity.z);
+		P1.setVelocity(tempVelocity);
+
+		 tempVelocity = glm::vec3(paddleVelocity.x + (bcf - bci) * collision.x, paddleVelocity.y + (bcf - bci) * collision.y, paddleVelocity.z);
+		puckObject.setVelocity(tempVelocity);
+
+
+	}else if(t== objectTag::P2){
+
+		vec3 collision = P2.getPosition() - puckObject.getPosition();
+		double distance = collision.length();
+
+		if (distance == 0.0) {              // hack to avoid div by zero
+
+			glm::vec3 collision = glm::vec3(1.0f, 0.0f, 0.0f);
+
+			double distance = 1.0;
+		}
+		if (distance > 1.0)
+			return;
+
+
+		vec3 paddleVelocity = P2.getVelocity();
+		vec3 puckVelocity = puckObject.getVelocity();
+
+		float aci = dot_product(paddleVelocity, collision);
+		float bci = dot_product(puckVelocity, collision);
+
+		float acf = bci;
+		float bcf = aci;
+
+		// Replace the collision velocity components with the new ones
+		vec3 tempVelocity = glm::vec3(paddleVelocity.x + (acf - aci) * collision.x, paddleVelocity.y + (acf - aci) * collision.y, paddleVelocity.z);
+		P2.setVelocity(tempVelocity);
+
+		 tempVelocity = glm::vec3(paddleVelocity.x + (bcf - bci) * collision.x, paddleVelocity.y + (bcf - bci) * collision.y, paddleVelocity.z);
+		puckObject.setVelocity(tempVelocity);
+	}
+
+}
+
+void puckCollisionWithWall(objectTag t )
+{
+	glm::vec3 tempVelocity;
+
+	if (t== objectTag::BM_WALL){
+	tempVelocity= glm::reflect(vec3(0,1,0), puckObject.getVelocity());
+	puckObject.setVelocity(tempVelocity);
+	}
+	else if (t== objectTag::T_WALL){
+	tempVelocity = glm::reflect(vec3(0,-1,0), puckObject.getVelocity());
+	puckObject.setVelocity(tempVelocity);
+	}
+	else if (t== objectTag::LS_WALL){
+	tempVelocity = glm::reflect(vec3(-1,0,0), puckObject.getVelocity());
+	puckObject.setVelocity(tempVelocity);
+	}
+	else if(t== objectTag::RS_WALL){
+	tempVelocity = glm::reflect(vec3(1,0,0), puckObject.getVelocity());
+	puckObject.setVelocity(tempVelocity);
+	}
+
+}
 
 struct Material
 {
@@ -327,6 +427,8 @@ struct Material
 	float			TextureMix;
 	float           Shininess;
 };
+
+
 
 int main() {
 	Logger::Init(); // We'll borrow the logger from the toolkit, but we need to initialize it
@@ -351,6 +453,19 @@ int main() {
 	VertexArrayObject::sptr puck = ObjLoader::LoadFromFile("Objects/AirHockeyPuck.obj");
 	VertexArrayObject::sptr player1 = ObjLoader::LoadFromFile("Objects/AirHockeyPad.obj");
 	VertexArrayObject::sptr player2 = ObjLoader::LoadFromFile("Objects/AirHockeyPad.obj");
+	VertexArrayObject::sptr P1Score = ObjLoader::LoadFromFile("Objects/ScoreCounter-0-FINAL.obj");
+	VertexArrayObject::sptr P2Score = ObjLoader::LoadFromFile("Objects/ScoreCounter-0-FINAL.obj");
+	
+	//ScoreUI objects sets the current OBJ
+	score_1.setCurrentVAO(P1Score);
+	score_2.setCurrentVAO(P2Score);
+
+
+	//ADD THE REST OF THE OBJ'S
+	//ADD NEW MATERIAL FOR SECOND SCORE
+	//LOOK INTO REASSIGNING OBJ FILE 
+	//if statment with score as a varilable and load in different objects
+	//Score += 1 within function adn update score accordingly
 		
 	// Load our shaders
 	Shader::sptr shader = Shader::Create();
@@ -358,17 +473,36 @@ int main() {
 	shader->LoadShaderPartFromFile("Shaders/frag_blinn_phong_textured.glsl", GL_FRAGMENT_SHADER);  
 	shader->Link();  
 
-	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 9.0f);
-	glm::vec3 lightCol = glm::vec3(0.3f, 0.42f, 0.69f);
-	float     lightAmbientPow = 2.9f;
+	glm::vec3 lightPos = glm::vec3(0.0f, 0.0f, 5.0f);
+	glm::vec3 lightCol = glm::vec3(0.0f, 0.45f, 0.94f);
+	float     lightAmbientPow = 0.789f;
 	float     lightSpecularPow = 1.0f;
 	glm::vec3 ambientCol = glm::vec3(1.0f);
-	float     ambientPow = 0.1f;
+	float     ambientPow = 0.606f;
 	float     shininess = 0.0f;
-	float     lightLinearFalloff = 0.190f;
-	float     lightQuadraticFalloff = 0.010f;
+	float     lightLinearFalloff = 0.260f;
+	float     lightQuadraticFalloff = 0.070f;
 	
 	// TODO: load textures
+
+#pragma region Texture
+// Load our texture data from a file
+	//Texture2DData::sptr paddlediffuseMap = Texture2DData::LoadFromFile("Images/Paddle_Diffuse.png");
+	//Texture2DData::sptr paddlespecularMap = Texture2DData::LoadFromFile("Images/Paddle_Specular.png");
+	//// Create a texture from the data
+	//Texture2D::sptr paddleDiffuse = Texture2D::Create();
+	//paddleDiffuse->LoadData(paddlediffuseMap);
+	//Texture2D::sptr paddleSpecular = Texture2D::Create();
+	//paddleSpecular->LoadData(paddlespecularMap);
+	//// Creating an empty texture
+	//Texture2DDescription PaddleDesc = Texture2DDescription();
+	//PaddleDesc.Width = 1;
+	//PaddleDesc.Height = 1;
+	//PaddleDesc.Format = InternalFormat::RGB8;
+	//Texture2D::sptr paddleTexture = Texture2D::Create(PaddleDesc);
+	//paddleTexture->Clear();
+
+#pragma endregion TableTexture
 
 #pragma region Texture
 // Load our texture data from a file
@@ -387,7 +521,7 @@ int main() {
 	Texture2D::sptr tableTexture = Texture2D::Create(tableDesc);
 	tableTexture->Clear();
 
-#pragma endregion PlasticTexture
+#pragma endregion TableTexture
 
 #pragma region Texture
 // Load our texture data from a file
@@ -422,10 +556,45 @@ int main() {
 
 #pragma endregion BoxTexture
 
+#pragma region Texture
+	Texture2DData::sptr P2scoreDiffuseMap = Texture2DData::LoadFromFile("Images/Red Color.jpg");
+	Texture2DData::sptr scoreSpecularMap = Texture2DData::LoadFromFile("Images/Red Color.jpg");
+	// Create a texture from the data
+	Texture2D::sptr P2scoreDiffuse = Texture2D::Create();
+	P2scoreDiffuse->LoadData(P2scoreDiffuseMap);
+	Texture2D::sptr P2scoreSpecular = Texture2D::Create();
+	P2scoreSpecular->LoadData(scoreSpecularMap);
+	// Creating an empty texture
+	Texture2DDescription P2scoreDesc = Texture2DDescription();
+	P2scoreDesc.Width = 1;
+	P2scoreDesc.Height = 1;
+	P2scoreDesc.Format = InternalFormat::RGB8;
+	Texture2D::sptr P2scoreTexture = Texture2D::Create(P2scoreDesc);
+	P2scoreTexture->Clear();
+
+#pragma endregion Score Texture
+
+#pragma region Texture
+	Texture2DData::sptr P1scoreDiffuseMap = Texture2DData::LoadFromFile("Images/Light Blue.jpg");
+	Texture2DData::sptr P1scoreSpecularMap = Texture2DData::LoadFromFile("Images/Light Blue.jpg");
+	// Create a texture from the data
+	Texture2D::sptr P1scoreDiffuse = Texture2D::Create();
+	P1scoreDiffuse->LoadData(P1scoreDiffuseMap);
+	Texture2D::sptr P1scoreSpecular = Texture2D::Create();
+	P1scoreSpecular->LoadData(P1scoreSpecularMap);
+	// Creating an empty texture
+	Texture2DDescription P1scoreDesc = Texture2DDescription();
+	P1scoreDesc.Width = 1;
+	P1scoreDesc.Height = 1;
+	P1scoreDesc.Format = InternalFormat::RGB8;
+	Texture2D::sptr P1scoreTexture = Texture2D::Create(P1scoreDesc);
+	P1scoreTexture->Clear();
+
+#pragma endregion Score Texture
 	// TODO: store some info about our materials for each object
 
 	// We'll use a temporary lil structure to store some info about our material (we'll expand this later)
-	Material materials[4];
+	Material materials[6];
 
 	materials[0].Albedo = tableDiffuse;
 	materials[0].Specular = tableSpecular;
@@ -445,11 +614,28 @@ int main() {
 	materials[2].Shininess = 32.0f;
 	materials[2].TextureMix = 0.0f;
 
+
+	materials[3].Albedo = plasticDiffuse;
+	materials[3].Specular = plasticSpecular;
+	materials[3].DiffuseTexture = boxDiffuse;
 	materials[3].Shininess = 32.0f;
+	materials[3].TextureMix = 0.0f;
+
+	materials[4].Albedo = P2scoreDiffuse;
+	materials[4].Specular = P2scoreSpecular;
+	materials[4].DiffuseTexture = boxDiffuse;
+	materials[4].Shininess = 32.0f;
+	materials[4].TextureMix = 0.0f;
+
+	materials[5].Albedo = P1scoreDiffuse;
+	materials[5].Specular = P1scoreSpecular;
+	materials[5].DiffuseTexture = boxDiffuse;
+	materials[5].Shininess = 32.0f;
+	materials[5].TextureMix = 0.0f;
 
 
 	camera = Camera::Create();
-	camera->SetPosition(glm::vec3(0, 3, 20)); // Set initial position
+	camera->SetPosition(glm::vec3(0, 3, 18)); // Set initial position
 	camera->SetUp(glm::vec3(0, 0, 1)); // Use a z-up coordinate system
 	camera->LookAt(glm::vec3(0.0f)); // Look at center of the screen
 	camera->SetFovDegrees(100.0f); // Set an initial FOV
@@ -517,24 +703,41 @@ int main() {
 	// NEW STUFF
 
 	// Create some transforms and initialize them
-	Transform::sptr transforms[4];
+	Transform::sptr transforms[6];
 	transforms[0] = Transform::Create();
 	transforms[1] = Transform::Create();
 	transforms[2] = Transform::Create();
 	transforms[3] = Transform::Create();
+	transforms[4] = Transform::Create();
+	transforms[5] = Transform::Create();
+
+
 
 	// We can use operator chaining, since our Set* methods return a pointer to the instance, neat!
 	transforms[0]->SetLocalPosition(0.0f, 0.0f, 0.0f)->SetLocalRotation(90.0, 0.0f, 0.0f);
-	transforms[1]->SetLocalPosition(0.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
-	transforms[2]->SetLocalPosition(3.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
-	transforms[3]->SetLocalPosition(-3.0f, 0.0f, 4.36f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	transforms[1]->SetLocalPosition(0.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	transforms[2]->SetLocalPosition(3.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	transforms[3]->SetLocalPosition(-3.0f, 0.0f, 4.45f)->SetLocalRotation(90.0f, 0.0f, 0.0f);
+	transforms[4]->SetLocalPosition(-7.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
+	transforms[5]->SetLocalPosition(14.0f, -10.0f, 4.45f)->SetLocalRotation(110.0f, 0.0f, 180.0f)->SetLocalScale(2.0f, 2.0f, 2.0f);
 
 	// We'll store all our VAOs into a nice array for easy access
-	VertexArrayObject::sptr vaos[4];
+	VertexArrayObject::sptr vaos[6];
 	vaos[0] = table;
 	vaos[1] = puck;
 	vaos[2] = player1;
 	vaos[3] = player2;
+	vaos[4] = P1Score;
+	vaos[5] = P2Score;
+	
+	puckObject.setTransform(transforms[1]);
+	P1.setTransform(transforms[2]);
+	P2.setTransform(transforms[3]);
+
+	puckObject.setTransform(transforms[3]);
+	P1.setTag(playerTag::PLAYER_ONE);
+	P2.setTag(playerTag::PLAYER_TWO);
+	
 
 	// We'll use a vector to store all our key press events for now
 	std::vector<KeyPressWatcher> keyToggles;
@@ -544,7 +747,7 @@ int main() {
 	// use std::bind
 	keyToggles.emplace_back(GLFW_KEY_T, [&](){ camera->ToggleOrtho(); });
 
-	int selectedVao = 0; // select cube by default
+	int selectedVao = 2; // select cube by default
 	keyToggles.emplace_back(GLFW_KEY_KP_ADD, [&]() {
 		selectedVao++;
 		if (selectedVao >= 4)
@@ -556,8 +759,26 @@ int main() {
 			selectedVao = 3;
 	});
 
+
+
 	InitImGui();
 		
+	std::vector<GameObject> boxes;
+	std::vector<GameObject> circles;
+
+	#pragma region GameObject Creation
+
+	boxes.push_back(GameObject(glm::vec3(0, 4.9, 0), objectTag::T_WALL));
+	boxes.push_back(GameObject(glm::vec3(0, -4.9, 0), objectTag::BM_WALL));
+	boxes.push_back(GameObject(glm::vec3(7, 4.9, 0), objectTag::LS_WALL));
+	boxes.push_back(GameObject(glm::vec3(-7, 4.9, 0), objectTag::RS_WALL));
+
+	circles.push_back(GameObject(glm::vec3(0.0f, 0.0f, 4.45f), objectTag::PUCK));
+	circles.push_back(GameObject(glm::vec3(3.0f, 0.0f, 4.45f), objectTag::P1));
+	circles.push_back(GameObject(glm::vec3(-3.0f, 0.0f, 4.45f), objectTag::P2));
+
+	#pragma endregion  
+
 	// Our high-precision timer
 	double lastFrame = glfwGetTime();
 	
@@ -577,15 +798,31 @@ int main() {
 			for (const KeyPressWatcher& watcher : keyToggles) {
 				watcher.Poll(window);
 			}
-
+			Player1Input(dt);
+			Player2Input(dt);
 			// We'll run some basic input to move our transform around
-			Player1Input(transforms[3], dt);
-			//ManipulateTransformWithInput(transforms[2], dt);
+			//ManipulateTransformWithInput(transforms[selectedVao], dt);
 		}
-
 
 		glClearColor(0.08f, 0.17f, 0.31f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		circles[0].UpdatePosition(transforms[1]->GetLocalPosition());
+		circles[1].UpdatePosition(transforms[2]->GetLocalPosition());
+		circles[2].UpdatePosition(transforms[3]->GetLocalPosition());
+
+		objectTag boxCol = CollisionDetection::CheckWallCollision(circles[0]);
+		if (!(boxCol== objectTag::NONE)){
+		puckCollisionWithWall(boxCol);
+		}
+		
+		for (int ix = 1; ix <= 2; ix++) {
+			bool cirCol = CollisionDetection::CheckSphereCollision(circles[ix], circles[0]);
+			objectTag cirtemp = circles[ix].GetTag();
+			if (cirCol) {
+			puckCollisionWithPlayer(cirtemp);
+			}
+		}
 
 		shader->Bind();
 		// These are the uniforms that update only once per frame
@@ -598,7 +835,7 @@ int main() {
 		shader->SetUniform("s_Diffuse2", 2);
 		
 		// Render all VAOs in our scene
-		for(int ix = 0; ix < 4; ix++) {
+		for(int ix = 0; ix < 6; ix++) {
 			// TODO: Apply materials
 			// Apply material properties for each instance
 			materials[ix].Albedo->Bind(0);
